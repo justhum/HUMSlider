@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  HUMSlider.h
 //  HUMSliderSample
 //
 //  Created by Ellen Shapiro on 12/26/14.
@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface HUMSlider : UISlider
 
 @end
-
