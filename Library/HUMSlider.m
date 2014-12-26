@@ -9,24 +9,32 @@
 #import "HUMSlider.h"
 
 // Animation Durations
-static NSTimeInterval const kAlphaDuration = 0.20;
-static NSTimeInterval const kMainTickDuration = 0.5;
+static NSTimeInterval const HUMTickAlphaDuration = 0.20;
+static NSTimeInterval const HUMTickMovementDuration = 0.5;
 static NSTimeInterval const kSecondTickDuration = 0.35;
-static NSTimeInterval const kAnimationDelay = 0.025;
+static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
-static CGFloat const kTickOutToInDifferential = 8;
-static CGFloat const kTickInToPoppedDifferential = 4;
+static CGFloat const HUMTickOutToInDifferential = 8;
+static CGFloat const HUMTickInToPoppedDifferential = 4;
+static CGFloat const HUMImagePadding = 8;
 
 // Sizes
-static CGFloat const kTickHeight = 6;
-static CGFloat const kTickWidth = 1;
+static CGFloat const HUMTickHeight = 6;
+static CGFloat const HUMTickWidth = 1;
 
 @interface HUMSlider ()
+@property (nonatomic) NSArray *tickViews;
+@property (nonatomic) NSArray *tickBottomConstraints;
+@property (nonatomic) NSArray *tickLeftConstraints;
 
-@property (nonatomic, strong) NSArray *tickViews;
-@property (nonatomic, strong) NSArray *tickBottomConstraints;
-@property (nonatomic, strong) NSArray *tickLeftConstraints;
+@property (nonatomic) UIImage *leftTemplate;
+@property (nonatomic) UIImage *rightTemplate;
+
+@property (nonatomic) UIImageView *leftSaturatedImageView;
+@property (nonatomic) UIImageView *leftDesaturatedImageView;
+@property (nonatomic) UIImageView *rightSaturatedImageView;
+@property (nonatomic) UIImageView *rightDesaturatedImageView;
 
 @end
 
@@ -36,9 +44,17 @@ static CGFloat const kTickWidth = 1;
 
 - (void)commonInit
 {
-    //Set default value.
+    //Set default values.
     self.sectionCount = 9;
     
+    self.saturatedColor = [UIColor redColor];
+    self.desaturatedColor = [UIColor lightGrayColor];
+    self.tickColor = [UIColor darkGrayColor];
+    
+    //Add self as target.
+    [self addTarget:self
+             action:@selector(sliderAdjusted)
+   forControlEvents:UIControlEventValueChanged];
 }
 
 - (id)init
@@ -68,7 +84,7 @@ static CGFloat const kTickWidth = 1;
     return self;
 }
 
-#pragma mark - Setup
+#pragma mark - Ticks
 
 - (void)nukeOldTicks
 {
@@ -118,7 +134,7 @@ static CGFloat const kTickWidth = 1;
                                                             toItem:nil
                                                          attribute:0
                                                         multiplier:1
-                                                          constant:kTickWidth]];
+                                                          constant:HUMTickWidth]];
         // Pin height of tick
         [self addConstraint:[NSLayoutConstraint constraintWithItem:currentTick
                                                          attribute:NSLayoutAttributeHeight
@@ -126,13 +142,13 @@ static CGFloat const kTickWidth = 1;
                                                             toItem:nil
                                                          attribute:0
                                                         multiplier:1
-                                                          constant:kTickHeight]];
+                                                          constant:HUMTickHeight]];
         
         CGFloat pinningConstant;
         if ([self isRunningLessThaniOS8]) {
             pinningConstant = 0;
         } else {
-            pinningConstant = kTickHeight * 3;
+            pinningConstant = HUMTickHeight * 3;
         }
         
         NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:currentTick
@@ -154,7 +170,7 @@ static CGFloat const kTickWidth = 1;
                                                    toItem:previousTick
                                                 attribute:NSLayoutAttributeTrailing
                                                multiplier:1
-                                                 constant:self.segmentWidth - kTickWidth];
+                                                 constant:self.segmentWidth - HUMTickWidth];
         } else {
             left = [NSLayoutConstraint constraintWithItem:currentTick
                                                 attribute:NSLayoutAttributeLeading
@@ -162,7 +178,7 @@ static CGFloat const kTickWidth = 1;
                                                    toItem:self
                                                 attribute:NSLayoutAttributeLeading
                                                multiplier:1
-                                                 constant:self.halfSegment - kTickWidth];
+                                                 constant:self.halfSegment - HUMTickWidth];
         }
         
         [self addConstraint:left];
@@ -172,6 +188,86 @@ static CGFloat const kTickWidth = 1;
     self.tickBottomConstraints = bottoms;
     self.tickLeftConstraints = lefts;
     [self layoutIfNeeded];
+}
+
+#pragma mark - Images
+
+- (void)setupSaturatedAndDesaturatedImageViews
+{
+    //Left
+    self.leftDesaturatedImageView = [[UIImageView alloc] init];
+    self.leftDesaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.leftDesaturatedImageView];
+    
+    self.leftSaturatedImageView = [[UIImageView alloc] init];
+    self.leftSaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.leftSaturatedImageView.alpha = 0.0f;
+    [self addSubview:self.leftSaturatedImageView];
+
+    //Right
+    self.rightDesaturatedImageView = [[UIImageView alloc] init];
+    self.rightDesaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.rightDesaturatedImageView];
+    
+    self.rightSaturatedImageView = [[UIImageView alloc] init];
+    self.rightSaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.rightSaturatedImageView.alpha = 0;
+    [self addSubview:self.rightSaturatedImageView];
+    
+    // Pin desaturated image views.
+    [self pinView:self.leftDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeLeft];
+    [self pinView:self.leftDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY];
+    [self pinView:self.rightDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeRight];
+    [self pinView:self.rightDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY];
+    
+    // Pin saturated image views to desaturated image views.
+    [self pinView1Center:self.leftSaturatedImageView toView2Center:self.leftDesaturatedImageView];
+    [self pinView1Center:self.rightSaturatedImageView toView2Center:self.rightDesaturatedImageView];
+}
+
+- (void)sliderAdjusted
+{
+    CGFloat halfValue = (self.minimumValue + self.maximumValue) / 2.0f;
+    
+    if (self.value > halfValue) {
+        self.rightSaturatedImageView.alpha = (self.value - halfValue) / halfValue;
+        self.leftSaturatedImageView.alpha = 0;
+    } else {
+        self.leftSaturatedImageView.alpha = (halfValue - self.value) / halfValue;
+        self.rightSaturatedImageView.alpha = 0;
+    }
+}
+
+#pragma mark - Convenience
+
+- (void)pinView:(UIView *)view toSuperViewAttribute:(NSLayoutAttribute)attribute
+{
+    [view.superview addConstraint:[NSLayoutConstraint constraintWithItem:view
+                                                               attribute:attribute
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:view.superview
+                                                               attribute:attribute
+                                                              multiplier:1
+                                                                constant:0]];
+}
+
+- (void)pinView1Center:(UIView *)view1 toView2Center:(UIView *)view2
+{
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:view1
+                                                    attribute:NSLayoutAttributeCenterY
+                                                    relatedBy:NSLayoutRelationEqual
+                                                       toItem:view2
+                                                    attribute:NSLayoutAttributeCenterY
+                                                   multiplier:1
+                                                     constant:0]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:view1
+                                                     attribute:NSLayoutAttributeCenterX
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:view2
+                                                     attribute:NSLayoutAttributeCenterX
+                                                    multiplier:1
+                                                      constant:0]];
+    
 }
 
 - (BOOL)isRunningLessThaniOS8
@@ -184,23 +280,25 @@ static CGFloat const kTickWidth = 1;
     }
 }
 
+#pragma mark - General layout
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    [self updateLeftConstraintsIfNeeded];
+    [self updateLeftTickConstraintsIfNeeded];
 }
 
-- (void)updateLeftConstraintsIfNeeded
+- (void)updateLeftTickConstraintsIfNeeded
 {
     NSLayoutConstraint *firstLeft = self.tickLeftConstraints.firstObject;
-    if (firstLeft.constant != (self.halfSegment - kTickWidth)) {
+    if (firstLeft.constant != (self.halfSegment - HUMTickWidth)) {
         // Need to be relaid out
         for (NSInteger i = 0; i < self.tickLeftConstraints.count; i++) {
             NSLayoutConstraint *left = self.tickLeftConstraints[i];
             if (i == 0) {
-                left.constant = self.halfSegment - kTickWidth;
+                left.constant = self.halfSegment - HUMTickWidth;
             } else {
-                left.constant = self.segmentWidth - kTickWidth;
+                left.constant = self.segmentWidth - HUMTickWidth;
             }
             
             [self layoutIfNeeded];
@@ -221,12 +319,47 @@ static CGFloat const kTickWidth = 1;
     [self setupTicks];
 }
 
+- (void)setLeftSideImage:(UIImage *)leftSideImage
+{
+    _leftSideImage = leftSideImage;
+    self.leftTemplate = [_leftSideImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.leftSaturatedImageView.image = self.leftTemplate;
+    self.leftDesaturatedImageView.image = self.leftTemplate;
+    
+    [self layoutIfNeeded];
+}
+
+- (void)setRightSideImage:(UIImage *)rightSideImage
+{
+    _rightSideImage = rightSideImage;
+    self.rightTemplate = [_rightSideImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.rightSaturatedImageView.image = self.rightTemplate;
+    self.rightDesaturatedImageView.image = self.rightTemplate;
+    
+    [self layoutIfNeeded];
+}
+
+- (void)setSaturatedColor:(UIColor *)saturatedColor
+{
+    _saturatedColor = saturatedColor;
+    self.leftSaturatedImageView.tintColor = _saturatedColor;
+    self.rightSaturatedImageView.tintColor = _saturatedColor;
+}
+
+- (void)setDesaturatedColor:(UIColor *)desaturatedColor
+{
+    _desaturatedColor = desaturatedColor;
+    self.leftDesaturatedImageView.tintColor = _desaturatedColor;
+    self.rightDesaturatedImageView.tintColor = _desaturatedColor;
+}
+
 #pragma mark - UIControl touch event tracking
+#pragma mark Animate In
 
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
     // Update the width
-    [self updateLeftConstraintsIfNeeded];
+    [self updateLeftTickConstraintsIfNeeded];
     [self animateAllTicksIn:YES];
     [self popTickIfNeededFromTouch:touch];
     
@@ -242,16 +375,16 @@ static CGFloat const kTickWidth = 1;
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
-        desiredOrigin = kTickInToPoppedDifferential;
+        desiredOrigin = HUMTickInToPoppedDifferential;
     } else {
         // Bring down.
-        desiredOrigin = kTickOutToInDifferential;
+        desiredOrigin = HUMTickOutToInDifferential;
     }
     
     if (CGRectGetMinY(tick.frame) != desiredOrigin) {
         [self animateTickAtIndex:tickIndex
                        toYOrigin:desiredOrigin
-                    withDuration:kMainTickDuration
+                    withDuration:HUMTickMovementDuration
                            delay:0];
     } // else tick is already where it needs to be.
 }
@@ -309,7 +442,7 @@ static CGFloat const kTickWidth = 1;
 
 - (void)animateAllTicksIn:(BOOL)inPosition
 {
-    CGFloat origin = kTickInToPoppedDifferential + kTickOutToInDifferential + kTickHeight;
+    CGFloat origin = HUMTickInToPoppedDifferential + HUMTickOutToInDifferential + HUMTickHeight;
     CGFloat alpha;
     
     if (inPosition) { // ticks are out, coming in
@@ -318,7 +451,7 @@ static CGFloat const kTickWidth = 1;
         alpha = 0;
     }
     
-    [UIView animateWithDuration:kAlphaDuration
+    [UIView animateWithDuration:HUMTickAlphaDuration
                      animations:^{
                          for (UIView *tick in self.tickViews) {
                              tick.alpha = alpha;
@@ -330,15 +463,15 @@ static CGFloat const kTickWidth = 1;
         NSInteger nextLowest = self.middleTickIndex - i;
         if (nextHighest == nextLowest) {
             // Middle tick
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:kMainTickDuration delay:0];
+            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:HUMTickMovementDuration delay:0];
         } else if (nextHighest - nextLowest == 2) {
             // Second tick
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:kSecondTickDuration delay:kAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:kSecondTickDuration delay:kAnimationDelay * i];
+            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:kSecondTickDuration delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:kSecondTickDuration delay:HUMTickAnimationDelay * i];
         } else {
             // Rest of ticks
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:kMainTickDuration delay:kAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:kMainTickDuration delay:kAnimationDelay * i];
+            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:HUMTickMovementDuration delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:HUMTickMovementDuration delay:HUMTickAnimationDelay * i];
         }
     }
 }
