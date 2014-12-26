@@ -16,7 +16,6 @@ static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
 static CGFloat const HUMTickOutToInDifferential = 8;
-static CGFloat const HUMTickInToPoppedDifferential = 4;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
@@ -223,6 +222,10 @@ static CGFloat const HUMTickWidth = 1;
     // Pin saturated image views to desaturated image views.
     [self pinView1Center:self.leftSaturatedImageView toView2Center:self.leftDesaturatedImageView];
     [self pinView1Center:self.rightSaturatedImageView toView2Center:self.rightDesaturatedImageView];
+    
+    //Reset colors
+    self.saturatedColor = self.saturatedColor;
+    self.desaturatedColor = self.desaturatedColor;
 }
 
 - (void)sliderAdjusted
@@ -236,6 +239,16 @@ static CGFloat const HUMTickWidth = 1;
         self.leftSaturatedImageView.alpha = (halfValue - self.value) / halfValue;
         self.rightSaturatedImageView.alpha = 0;
     }
+}
+
+- (CGRect)minimumValueImageRectForBounds:(CGRect)bounds
+{
+    return self.leftDesaturatedImageView.frame;
+}
+
+- (CGRect)maximumValueImageRectForBounds:(CGRect)bounds
+{
+    return self.rightDesaturatedImageView.frame;
 }
 
 #pragma mark - Convenience
@@ -291,12 +304,12 @@ static CGFloat const HUMTickWidth = 1;
 - (void)updateLeftTickConstraintsIfNeeded
 {
     NSLayoutConstraint *firstLeft = self.tickLeftConstraints.firstObject;
-    if (firstLeft.constant != (self.halfSegment - HUMTickWidth)) {
+    if (firstLeft.constant != (self.trackXOrigin + self.halfSegment - HUMTickWidth)) {
         // Need to be relaid out
         for (NSInteger i = 0; i < self.tickLeftConstraints.count; i++) {
             NSLayoutConstraint *left = self.tickLeftConstraints[i];
             if (i == 0) {
-                left.constant = self.halfSegment - HUMTickWidth;
+                left.constant = self.trackXOrigin + self.halfSegment - HUMTickWidth;
             } else {
                 left.constant = self.segmentWidth - HUMTickWidth;
             }
@@ -308,7 +321,7 @@ static CGFloat const HUMTickWidth = 1;
 
 #pragma mark - Overridden Setters
 
-- (void)setSectionCount:(NSInteger)sectionCount
+- (void)setSectionCount:(NSUInteger)sectionCount
 {
     // Warn the developer that they need to use an odd number of sections.
     NSAssert(sectionCount % 2 != 0, @"Must use an odd number of sections!");
@@ -319,22 +332,39 @@ static CGFloat const HUMTickWidth = 1;
     [self setupTicks];
 }
 
-- (void)setLeftSideImage:(UIImage *)leftSideImage
+- (void)setMinimumValueImage:(UIImage *)minimumValueImage
 {
-    _leftSideImage = leftSideImage;
-    self.leftTemplate = [_leftSideImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    if (!self.leftDesaturatedImageView) {
+        [self setupSaturatedAndDesaturatedImageViews];
+    }
+    
+    self.leftTemplate = [minimumValueImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [super setMinimumValueImage:self.leftTemplate];
     self.leftSaturatedImageView.image = self.leftTemplate;
     self.leftDesaturatedImageView.image = self.leftTemplate;
+    
+    // Bring to the front or they'll get covered by the minimum value image.
+    [self bringSubviewToFront:self.leftDesaturatedImageView];
+    [self bringSubviewToFront:self.leftSaturatedImageView];
     
     [self layoutIfNeeded];
 }
 
-- (void)setRightSideImage:(UIImage *)rightSideImage
+- (void)setMaximumValueImage:(UIImage *)maximumValueImage
 {
-    _rightSideImage = rightSideImage;
-    self.rightTemplate = [_rightSideImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    if (!self.leftDesaturatedImageView) {
+        [self setupSaturatedAndDesaturatedImageViews];
+    }
+    
+    self.rightTemplate = [maximumValueImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+
+    [super setMaximumValueImage:self.rightTemplate];
     self.rightSaturatedImageView.image = self.rightTemplate;
     self.rightDesaturatedImageView.image = self.rightTemplate;
+    
+    // Bring to the front or they'll get covered by the minimum value image.
+    [self bringSubviewToFront:self.rightDesaturatedImageView];
+    [self bringSubviewToFront:self.rightSaturatedImageView];
     
     [self layoutIfNeeded];
 }
@@ -369,13 +399,13 @@ static CGFloat const HUMTickWidth = 1;
 - (void)animateTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
     UIView *tick = self.tickViews[tickIndex];
-    CGFloat startSegmentX = tickIndex * self.segmentWidth;
+    CGFloat startSegmentX = (tickIndex * self.segmentWidth) + self.trackXOrigin;
     CGFloat endSegmentX = startSegmentX + self.segmentWidth;
     
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
-        desiredOrigin = HUMTickInToPoppedDifferential;
+        desiredOrigin = [self tickInToPoppedDifferential];
     } else {
         // Bring down.
         desiredOrigin = HUMTickOutToInDifferential;
@@ -442,7 +472,7 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)animateAllTicksIn:(BOOL)inPosition
 {
-    CGFloat origin = HUMTickInToPoppedDifferential + HUMTickOutToInDifferential + HUMTickHeight;
+    CGFloat origin = [self tickInToPoppedDifferential] + HUMTickOutToInDifferential + HUMTickHeight;
     CGFloat alpha;
     
     if (inPosition) { // ticks are out, coming in
@@ -500,9 +530,16 @@ static CGFloat const HUMTickWidth = 1;
 
 #pragma mark - Calculation helpers
 
+- (CGFloat)trackXOrigin
+{
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
+    return CGRectGetMinX(trackRect);
+}
+
 - (CGFloat)segmentWidth
 {
-    return floorf(CGRectGetWidth(self.frame) / self.sectionCount);
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
+    return floorf(CGRectGetWidth(trackRect) / self.sectionCount);
 }
 
 - (CGFloat)halfSegment
@@ -513,6 +550,12 @@ static CGFloat const HUMTickWidth = 1;
 - (NSInteger)middleTickIndex
 {
     return floor(self.tickViews.count / 2);
+}
+
+- (CGFloat)tickInToPoppedDifferential
+{
+    CGFloat halfThumb = [self thumbImageForState:UIControlStateHighlighted].size.height / 2.0f;
+    return halfThumb;
 }
 
 @end

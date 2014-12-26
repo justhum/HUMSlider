@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+/**
+ * A slider which pops up ticks and saturates/desaturates images when the user adjusts
+ * a slider for better feedback to the user about their adjustment.
+ *
+ * NOTE: This is not using IBDesignable in order to maintain compatibility with
+ *       iOS 7. *sad trombone*
+ */
 @interface HUMSlider : UISlider
 
 #pragma mark - Ticks
@@ -16,15 +23,9 @@
 @property (nonatomic) UIColor *tickColor;
 
 ///How many sections of ticks should be created. NOTE: Needs to be an odd number or math falls apart. Defaults to 9. 
-@property (nonatomic) NSInteger sectionCount;
+@property (nonatomic) NSUInteger sectionCount;
 
 #pragma mark - Images
-
-///The image to be displayed to the left of the slider.
-@property (nonatomic) UIImage *leftSideImage;
-
-///The image to be displayed to the right side of the slider.
-@property (nonatomic) UIImage *rightSideImage;
 
 ///The color to use as the fully-saturated color. Defaults to red.
 @property (nonatomic) UIColor *saturatedColor;
