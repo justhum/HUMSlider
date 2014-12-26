@@ -10,4 +10,12 @@
 
 @interface HUMSlider : UISlider
 
+#pragma mark - Section data
+
+///The color of the ticks you wish to pop up.
+@property (nonatomic) UIColor *tickColor;
+
+///How many sections of ticks should be created. NOTE: Needs to be an odd number or math falls apart. Defaults to 9. 
+@property (nonatomic) NSInteger sectionCount;
+
 @end
