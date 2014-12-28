@@ -16,6 +16,7 @@ static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
 static CGFloat const HUMTickOutToInDifferential = 8;
+static CGFloat const HUMImagePadding = 8;
 
 // Sizes
 static CGFloat const HUMTickHeight = 6;
@@ -273,6 +274,30 @@ static CGFloat const HUMTickWidth = 1;
 {
     CGRect superRect = [super trackRectForBounds:bounds];
     superRect.origin.y += HUMTickHeight;
+    
+    // Adjust the track rect so images are always a consistent padding.
+    
+    if (self.leftDesaturatedImageView) {
+        CGFloat leftImageViewToTrackOrigin = CGRectGetMinX(superRect) - CGRectGetMaxX(self.leftDesaturatedImageView.frame);
+        
+        if (leftImageViewToTrackOrigin != HUMImagePadding) {
+            CGFloat leftAdjust = leftImageViewToTrackOrigin - HUMImagePadding;
+            superRect.origin.x -= leftAdjust;
+            superRect.size.width += leftAdjust;
+        }
+    }
+    
+    if (self.rightDesaturatedImageView) {
+        CGFloat endOfTrack = CGRectGetMaxX(superRect);
+        CGFloat startOfRight = CGRectGetMinX(self.rightDesaturatedImageView.frame);
+        CGFloat trackEndToRightImageView = startOfRight - endOfTrack;
+        
+        if (trackEndToRightImageView != HUMImagePadding) {
+            CGFloat rightAdjust = trackEndToRightImageView - HUMImagePadding;
+            superRect.size.width += rightAdjust;
+        }
+    }
+    
     return superRect;
 }
 
