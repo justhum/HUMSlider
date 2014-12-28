@@ -144,17 +144,15 @@ static CGFloat const HUMTickWidth = 1;
                                                           constant:HUMTickHeight]];
         
         CGFloat pinningConstant;
-        if ([self isRunningLessThaniOS8]) {
-            pinningConstant = 0;
-        } else {
-            pinningConstant = HUMTickHeight * 3;
-        }
+        
+        CGFloat minY = CGRectGetMinY([self trackRectForBounds:self.bounds]);
+        pinningConstant = minY;
         
         NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:currentTick
                                                                   attribute:NSLayoutAttributeBottom
                                                                   relatedBy:NSLayoutRelationEqual
                                                                      toItem:self
-                                                                  attribute:NSLayoutAttributeTop
+                                                                  attribute:NSLayoutAttributeBottom
                                                                  multiplier:1
                                                                    constant:pinningConstant];
         [self addConstraint:bottom];
@@ -215,9 +213,9 @@ static CGFloat const HUMTickWidth = 1;
     
     // Pin desaturated image views.
     [self pinView:self.leftDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeLeft];
-    [self pinView:self.leftDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY];
+    [self pinView:self.leftDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY constant:HUMTickOutToInDifferential];
     [self pinView:self.rightDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeRight];
-    [self pinView:self.rightDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY];
+    [self pinView:self.rightDesaturatedImageView toSuperViewAttribute:NSLayoutAttributeCenterY constant:HUMTickOutToInDifferential];
     
     // Pin saturated image views to desaturated image views.
     [self pinView1Center:self.leftSaturatedImageView toView2Center:self.leftDesaturatedImageView];
@@ -241,8 +239,20 @@ static CGFloat const HUMTickWidth = 1;
     }
 }
 
+#pragma mark - Superclass Overrides
+
+- (CGSize)intrinsicContentSize
+{
+    CGFloat maxPoppedHeight = [self thumbHeight] + fabs([self tickInToPoppedDifferential]) + HUMTickHeight + HUMTickOutToInDifferential;
+    
+    CGFloat largestHeight = MAX(CGRectGetHeight(self.rightSaturatedImageView.frame),
+                                MAX(CGRectGetHeight(self.leftSaturatedImageView.frame), maxPoppedHeight));
+    return CGSizeMake(CGRectGetWidth(self.frame), largestHeight);
+}
+
 - (CGRect)minimumValueImageRectForBounds:(CGRect)bounds
 {
+    
     return self.leftDesaturatedImageView.frame;
 }
 
@@ -251,9 +261,21 @@ static CGFloat const HUMTickWidth = 1;
     return self.rightDesaturatedImageView.frame;
 }
 
+- (CGRect)trackRectForBounds:(CGRect)bounds
+{
+    CGRect superRect = [super trackRectForBounds:bounds];
+    superRect.origin.y += HUMTickOutToInDifferential;
+    return superRect;
+}
+
 #pragma mark - Convenience
 
 - (void)pinView:(UIView *)view toSuperViewAttribute:(NSLayoutAttribute)attribute
+{
+    [self pinView:view toSuperViewAttribute:attribute constant:0];
+}
+
+- (void)pinView:(UIView *)view toSuperViewAttribute:(NSLayoutAttribute)attribute constant:(CGFloat)constant
 {
     [view.superview addConstraint:[NSLayoutConstraint constraintWithItem:view
                                                                attribute:attribute
@@ -261,7 +283,7 @@ static CGFloat const HUMTickWidth = 1;
                                                                   toItem:view.superview
                                                                attribute:attribute
                                                               multiplier:1
-                                                                constant:0]];
+                                                                constant:constant]];
 }
 
 - (void)pinView1Center:(UIView *)view1 toView2Center:(UIView *)view2
@@ -405,10 +427,10 @@ static CGFloat const HUMTickWidth = 1;
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
-        desiredOrigin = [self tickInToPoppedDifferential];
+        desiredOrigin = -([self tickInToPoppedDifferential] + [self trackYOrigin] + HUMTickHeight);
     } else {
         // Bring down.
-        desiredOrigin = HUMTickOutToInDifferential;
+        desiredOrigin = -[self trackYOrigin];
     }
     
     if (CGRectGetMinY(tick.frame) != desiredOrigin) {
@@ -536,6 +558,12 @@ static CGFloat const HUMTickWidth = 1;
     return CGRectGetMinX(trackRect);
 }
 
+- (CGFloat)trackYOrigin
+{
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
+    return CGRectGetMinY(trackRect);
+}
+
 - (CGFloat)segmentWidth
 {
     CGRect trackRect = [self trackRectForBounds:self.bounds];
@@ -552,10 +580,20 @@ static CGFloat const HUMTickWidth = 1;
     return floor(self.tickViews.count / 2);
 }
 
+- (CGFloat)thumbHeight
+{
+    CGRect thumbRect = [self thumbRectForBounds:self.bounds
+                                      trackRect:[self trackRectForBounds:self.bounds]
+                                          value:self.value];
+    return CGRectGetHeight(thumbRect);
+}
+
 - (CGFloat)tickInToPoppedDifferential
 {
-    CGFloat halfThumb = [self thumbImageForState:UIControlStateHighlighted].size.height / 2.0f;
-    return halfThumb;
+    CGFloat halfThumb = [self thumbHeight] / 2.0f;
+    CGFloat inToUp = -halfThumb + HUMTickOutToInDifferential + 4;
+    
+    return inToUp;
 }
 
 @end
