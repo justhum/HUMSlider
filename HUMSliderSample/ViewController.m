@@ -21,13 +21,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
+    //This uses default values for everything except max and min images.
     self.sliderFromNib.minimumValueImage = [self sadImage];
     self.sliderFromNib.maximumValueImage = [self happyImage];
-    self.sliderFromNib.sectionCount = 9;
-    
-    self.sliderFromNib.layer.borderColor = [UIColor orangeColor].CGColor;
-    self.sliderFromNib.layer.borderWidth = 1;
     
     [self setupSliderProgrammatically];
 }
@@ -67,8 +64,11 @@
     self.programmaticSlider.minimumValue = 0;
     self.programmaticSlider.maximumValue = 100;
     self.programmaticSlider.value = 25;
+    
+    // Use some crazypants colors to make this obvious
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
-    self.programmaticSlider.desaturatedColor = [UIColor brownColor];
+    self.programmaticSlider.desaturatedColor = [[UIColor brownColor] colorWithAlphaComponent:0.2f];
+    self.programmaticSlider.tickColor = [UIColor orangeColor];
 }
 
 #pragma mark - Convenience images

@@ -235,6 +235,19 @@ static CGFloat const HUMTickWidth = 1;
     }
 }
 
+- (UIImage *)transparentImageOfSize:(CGSize)size
+{
+    if (CGSizeEqualToSize(size, CGSizeZero)) {
+        return nil;
+    }
+    
+    UIGraphicsBeginImageContextWithOptions(size, NO, 0.0f);
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return newImage;
+}
+
 #pragma mark - Superclass Overrides
 
 - (CGSize)intrinsicContentSize
@@ -248,7 +261,6 @@ static CGFloat const HUMTickWidth = 1;
 
 - (CGRect)minimumValueImageRectForBounds:(CGRect)bounds
 {
-    
     return self.leftDesaturatedImageView.frame;
 }
 
@@ -362,8 +374,8 @@ static CGFloat const HUMTickWidth = 1;
         [self setupSaturatedAndDesaturatedImageViews];
     }
     
+    [super setMinimumValueImage:[self transparentImageOfSize:minimumValueImage.size]];
     self.leftTemplate = [minimumValueImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [super setMinimumValueImage:self.leftTemplate];
     self.leftSaturatedImageView.image = self.leftTemplate;
     self.leftDesaturatedImageView.image = self.leftTemplate;
     
@@ -380,9 +392,8 @@ static CGFloat const HUMTickWidth = 1;
         [self setupSaturatedAndDesaturatedImageViews];
     }
     
+    [super setMaximumValueImage:[self transparentImageOfSize:maximumValueImage.size]];
     self.rightTemplate = [maximumValueImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-
-    [super setMaximumValueImage:self.rightTemplate];
     self.rightSaturatedImageView.image = self.rightTemplate;
     self.rightDesaturatedImageView.image = self.rightTemplate;
     
