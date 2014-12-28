@@ -16,7 +16,6 @@ static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
 static CGFloat const HUMTickOutToInDifferential = 8;
-static CGFloat const HUMImagePadding = 8;
 
 // Sizes
 static CGFloat const HUMTickHeight = 6;
@@ -143,18 +142,14 @@ static CGFloat const HUMTickWidth = 1;
                                                         multiplier:1
                                                           constant:HUMTickHeight]];
         
-        CGFloat pinningConstant;
-        
-        CGFloat minY = CGRectGetMinY([self trackRectForBounds:self.bounds]);
-        pinningConstant = minY;
-        
+        // Pin bottom of tick to top of track.
         NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:currentTick
                                                                   attribute:NSLayoutAttributeBottom
                                                                   relatedBy:NSLayoutRelationEqual
                                                                      toItem:self
                                                                   attribute:NSLayoutAttributeBottom
                                                                  multiplier:1
-                                                                   constant:pinningConstant];
+                                                                   constant:[self tickOutPosition]];
         [self addConstraint:bottom];
         [bottoms addObject:bottom];
         
@@ -243,10 +238,10 @@ static CGFloat const HUMTickWidth = 1;
 
 - (CGSize)intrinsicContentSize
 {
-    CGFloat maxPoppedHeight = [self thumbHeight] + fabs([self tickInToPoppedDifferential]) + HUMTickHeight + HUMTickOutToInDifferential;
+    CGFloat maxPoppedHeight = CGRectGetHeight([self thumbRectForBounds:self.bounds trackRect:[self trackRectForBounds:self.bounds] value:self.value]) + HUMTickHeight;
     
-    CGFloat largestHeight = MAX(CGRectGetHeight(self.rightSaturatedImageView.frame),
-                                MAX(CGRectGetHeight(self.leftSaturatedImageView.frame), maxPoppedHeight));
+    CGFloat largestHeight = MAX(CGRectGetMaxY(self.rightSaturatedImageView.frame),
+                                MAX(CGRectGetMaxY(self.leftSaturatedImageView.frame), maxPoppedHeight));
     return CGSizeMake(CGRectGetWidth(self.frame), largestHeight);
 }
 
@@ -264,7 +259,7 @@ static CGFloat const HUMTickWidth = 1;
 - (CGRect)trackRectForBounds:(CGRect)bounds
 {
     CGRect superRect = [super trackRectForBounds:bounds];
-    superRect.origin.y += HUMTickOutToInDifferential;
+    superRect.origin.y += HUMTickHeight;
     return superRect;
 }
 
@@ -427,10 +422,10 @@ static CGFloat const HUMTickWidth = 1;
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
-        desiredOrigin = -([self tickInToPoppedDifferential] + [self trackYOrigin] + HUMTickHeight);
+        desiredOrigin = [self tickPoppedPosition];
     } else {
         // Bring down.
-        desiredOrigin = -[self trackYOrigin];
+        desiredOrigin = [self tickInNotPoppedPositon];
     }
     
     if (CGRectGetMinY(tick.frame) != desiredOrigin) {
@@ -494,13 +489,15 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)animateAllTicksIn:(BOOL)inPosition
 {
-    CGFloat origin = [self tickInToPoppedDifferential] + HUMTickOutToInDifferential + HUMTickHeight;
+    CGFloat origin;
     CGFloat alpha;
     
     if (inPosition) { // ticks are out, coming in
         alpha = 1;
+        origin = [self tickInNotPoppedPositon];
     } else { // Ticks are in, coming out.
         alpha = 0;
+        origin = [self tickOutPosition];
     }
     
     [UIView animateWithDuration:HUMTickAlphaDuration
@@ -515,15 +512,30 @@ static CGFloat const HUMTickWidth = 1;
         NSInteger nextLowest = self.middleTickIndex - i;
         if (nextHighest == nextLowest) {
             // Middle tick
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:HUMTickMovementDuration delay:0];
+            [self animateTickAtIndex:nextHighest
+                           toYOrigin:origin
+                        withDuration:HUMTickMovementDuration
+                               delay:0];
         } else if (nextHighest - nextLowest == 2) {
             // Second tick
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:kSecondTickDuration delay:HUMTickAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:kSecondTickDuration delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextHighest
+                           toYOrigin:origin
+                        withDuration:kSecondTickDuration
+                               delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextLowest
+                           toYOrigin:origin
+                        withDuration:kSecondTickDuration
+                               delay:HUMTickAnimationDelay * i];
         } else {
             // Rest of ticks
-            [self animateTickAtIndex:nextHighest toYOrigin:origin withDuration:HUMTickMovementDuration delay:HUMTickAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest toYOrigin:origin withDuration:HUMTickMovementDuration delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextHighest
+                           toYOrigin:origin
+                        withDuration:HUMTickMovementDuration
+                               delay:HUMTickAnimationDelay * i];
+            [self animateTickAtIndex:nextLowest
+                           toYOrigin:origin
+                        withDuration:HUMTickMovementDuration
+                               delay:HUMTickAnimationDelay * i];
         }
     }
 }
@@ -591,9 +603,24 @@ static CGFloat const HUMTickWidth = 1;
 - (CGFloat)tickInToPoppedDifferential
 {
     CGFloat halfThumb = [self thumbHeight] / 2.0f;
-    CGFloat inToUp = -halfThumb + HUMTickOutToInDifferential + 4;
+    CGFloat inToUp = halfThumb - HUMTickOutToInDifferential;
     
     return inToUp;
+}
+
+- (CGFloat)tickOutPosition
+{
+    return -(CGRectGetMaxY(self.bounds) - [self trackYOrigin]);
+}
+
+- (CGFloat)tickInNotPoppedPositon
+{
+    return [self tickOutPosition] - HUMTickOutToInDifferential + HUMTickHeight / 2;
+}
+
+- (CGFloat)tickPoppedPosition
+{
+    return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential];
 }
 
 @end
