@@ -339,6 +339,12 @@ static CGFloat const HUMTickWidth = 1;
 
 #pragma mark - Overridden Setters
 
+- (void)setValue:(float)value
+{
+    [super setValue:value];
+    [self sliderAdjusted];
+}
+
 - (void)setSectionCount:(NSUInteger)sectionCount
 {
     // Warn the developer that they need to use an odd number of sections.

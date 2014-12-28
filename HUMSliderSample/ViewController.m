@@ -64,6 +64,9 @@
     self.programmaticSlider.minimumValueImage = [self sadImage];
     self.programmaticSlider.maximumValueImage = [self happyImage];
     
+    self.programmaticSlider.minimumValue = 0;
+    self.programmaticSlider.maximumValue = 100;
+    self.programmaticSlider.value = 25;
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
     self.programmaticSlider.desaturatedColor = [UIColor brownColor];
 }
