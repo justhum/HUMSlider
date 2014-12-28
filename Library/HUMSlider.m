@@ -401,6 +401,16 @@ static CGFloat const HUMTickWidth = 1;
     self.rightDesaturatedImageView.tintColor = _desaturatedColor;
 }
 
+- (void)setTickColor:(UIColor *)tickColor
+{
+    _tickColor = tickColor;
+    if (self.tickViews) {
+        for (UIView *tick in self.tickViews) {
+            tick.backgroundColor = _tickColor;
+        }
+    }
+}
+
 #pragma mark - UIControl touch event tracking
 #pragma mark Animate In
 
