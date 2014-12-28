@@ -11,7 +11,7 @@
 // Animation Durations
 static NSTimeInterval const HUMTickAlphaDuration = 0.20;
 static NSTimeInterval const HUMTickMovementDuration = 0.5;
-static NSTimeInterval const kSecondTickDuration = 0.35;
+static NSTimeInterval const HUMSecondTickDuration = 0.35;
 static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
@@ -538,11 +538,11 @@ static CGFloat const HUMTickWidth = 1;
             // Second tick
             [self animateTickAtIndex:nextHighest
                            toYOrigin:origin
-                        withDuration:kSecondTickDuration
+                        withDuration:HUMSecondTickDuration
                                delay:HUMTickAnimationDelay * i];
             [self animateTickAtIndex:nextLowest
                            toYOrigin:origin
-                        withDuration:kSecondTickDuration
+                        withDuration:HUMSecondTickDuration
                                delay:HUMTickAnimationDelay * i];
         } else {
             // Rest of ticks
