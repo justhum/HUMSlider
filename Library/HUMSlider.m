@@ -313,16 +313,6 @@ static CGFloat const HUMTickWidth = 1;
     
 }
 
-- (BOOL)isRunningLessThaniOS8
-{
-    if ([[NSProcessInfo processInfo] respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)]) {
-        // This is at least iOS 8 if it responds to this selector.
-        return NO;
-    } else {
-        return YES;
-    }
-}
-
 #pragma mark - General layout
 
 - (void)layoutSubviews
