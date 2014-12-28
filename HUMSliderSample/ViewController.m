@@ -65,6 +65,11 @@
     self.programmaticSlider.maximumValue = 100;
     self.programmaticSlider.value = 25;
     
+    // Custom track/thumb
+    [self.programmaticSlider setMinimumTrackImage:[self darkTrack] forState:UIControlStateNormal];
+    [self.programmaticSlider setMaximumTrackImage:[self darkTrack] forState:UIControlStateNormal];
+    [self.programmaticSlider setThumbImage:[self darkThumb] forState:UIControlStateNormal];
+    
     // Use some crazypants colors to make this obvious
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
     self.programmaticSlider.desaturatedColor = [[UIColor brownColor] colorWithAlphaComponent:0.2f];
@@ -72,6 +77,16 @@
 }
 
 #pragma mark - Convenience images
+
+- (UIImage *)darkTrack
+{
+    return [[UIImage imageNamed:@"SliderTrack"] stretchableImageWithLeftCapWidth:4 topCapHeight:0];
+}
+
+- (UIImage *)darkThumb
+{
+    return [UIImage imageNamed:@"SliderThumb"];
+}
 
 - (UIImage *)sadImage
 {
