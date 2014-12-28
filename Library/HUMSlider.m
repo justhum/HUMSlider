@@ -105,6 +105,7 @@ static CGFloat const HUMTickWidth = 1;
         tick.backgroundColor = self.tickColor;
         tick.alpha = 0;
         [self addSubview:tick];
+        [self sendSubviewToBack:tick];
         [tickBuilder addObject:tick];
     }
     
