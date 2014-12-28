@@ -25,6 +25,9 @@
 ///How many sections of ticks should be created. NOTE: Needs to be an odd number or math falls apart. Defaults to 9. 
 @property (nonatomic) NSUInteger sectionCount;
 
+///How many points the tick popping should be adjusted for a custom thumbnail image to account for any space at the top (for example, to balance out a custom shadow).
+@property (nonatomic) CGFloat pointAdjustmentForCustomThumb;
+
 #pragma mark - Images
 
 ///The color to use as the fully-saturated color. Defaults to red.

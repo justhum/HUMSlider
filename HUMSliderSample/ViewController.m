@@ -70,6 +70,9 @@
     [self.programmaticSlider setMaximumTrackImage:[self darkTrack] forState:UIControlStateNormal];
     [self.programmaticSlider setThumbImage:[self darkThumb] forState:UIControlStateNormal];
     
+    // This thumb has some space at the top to balance out the shadow built into it.
+    self.programmaticSlider.pointAdjustmentForCustomThumb = 8;
+    
     // Use some crazypants colors to make this obvious
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
     self.programmaticSlider.desaturatedColor = [[UIColor brownColor] colorWithAlphaComponent:0.2f];

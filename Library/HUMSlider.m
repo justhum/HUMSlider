@@ -663,7 +663,7 @@ static CGFloat const HUMTickWidth = 1;
 
 - (CGFloat)tickPoppedPosition
 {
-    return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential];
+    return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential] + self.pointAdjustmentForCustomThumb;
 }
 
 @end
