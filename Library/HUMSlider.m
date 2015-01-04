@@ -358,9 +358,9 @@ static CGFloat const HUMTickWidth = 1;
             } else {
                 left.constant = self.segmentWidth - HUMTickWidth;
             }
-            
-            [self layoutIfNeeded];
         }
+        
+        [self layoutIfNeeded];
     } // else good to go.
 }
 
@@ -397,8 +397,6 @@ static CGFloat const HUMTickWidth = 1;
     // Bring to the front or they'll get covered by the minimum value image.
     [self bringSubviewToFront:self.leftDesaturatedImageView];
     [self bringSubviewToFront:self.leftSaturatedImageView];
-    
-    [self layoutIfNeeded];
 }
 
 - (void)setMaximumValueImage:(UIImage *)maximumValueImage
@@ -415,8 +413,6 @@ static CGFloat const HUMTickWidth = 1;
     // Bring to the front or they'll get covered by the minimum value image.
     [self bringSubviewToFront:self.rightDesaturatedImageView];
     [self bringSubviewToFront:self.rightSaturatedImageView];
-    
-    [self layoutIfNeeded];
 }
 
 - (void)setSaturatedColor:(UIColor *)saturatedColor
