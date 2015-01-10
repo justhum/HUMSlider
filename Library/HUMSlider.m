@@ -46,6 +46,10 @@ static CGFloat const HUMTickWidth = 1;
 {
     //Set default values.
     self.sectionCount = 9;
+    self.tickAlphaAnimationDuration = HUMTickAlphaDuration;
+    self.tickMovementAnimationDuration = HUMTickMovementDuration;
+    self.secondTickMovementAndimationDuration = HUMSecondTickDuration;
+    self.nextTickAnimationDelay = HUMTickAnimationDelay;
     
     self.saturatedColor = [UIColor redColor];
     self.desaturatedColor = [UIColor lightGrayColor];
@@ -509,7 +513,7 @@ static CGFloat const HUMTickWidth = 1;
     if (CGRectGetMinY(tick.frame) != desiredOrigin) {
         [self animateTickAtIndex:tickIndex
                        toYOrigin:desiredOrigin
-                    withDuration:HUMTickMovementDuration
+                    withDuration:self.tickMovementAnimationDuration
                            delay:0];
     } // else tick is already where it needs to be.
 }
@@ -578,7 +582,7 @@ static CGFloat const HUMTickWidth = 1;
         origin = [self tickOutPosition];
     }
     
-    [UIView animateWithDuration:HUMTickAlphaDuration
+    [UIView animateWithDuration:self.tickAlphaAnimationDuration
                      animations:^{
                          for (UIView *tick in self.tickViews) {
                              tick.alpha = alpha;
@@ -592,28 +596,28 @@ static CGFloat const HUMTickWidth = 1;
             // Middle tick
             [self animateTickAtIndex:nextHighest
                            toYOrigin:origin
-                        withDuration:HUMTickMovementDuration
+                        withDuration:self.tickMovementAnimationDuration
                                delay:0];
         } else if (nextHighest - nextLowest == 2) {
             // Second tick
             [self animateTickAtIndex:nextHighest
                            toYOrigin:origin
-                        withDuration:HUMSecondTickDuration
-                               delay:HUMTickAnimationDelay * i];
+                        withDuration:self.secondTickMovementAndimationDuration
+                               delay:self.nextTickAnimationDelay * i];
             [self animateTickAtIndex:nextLowest
                            toYOrigin:origin
-                        withDuration:HUMSecondTickDuration
-                               delay:HUMTickAnimationDelay * i];
+                        withDuration:self.secondTickMovementAndimationDuration
+                               delay:self.nextTickAnimationDelay * i];
         } else {
             // Rest of ticks
             [self animateTickAtIndex:nextHighest
                            toYOrigin:origin
-                        withDuration:HUMTickMovementDuration
-                               delay:HUMTickAnimationDelay * i];
+                        withDuration:self.tickMovementAnimationDuration
+                               delay:self.nextTickAnimationDelay * i];
             [self animateTickAtIndex:nextLowest
                            toYOrigin:origin
-                        withDuration:HUMTickMovementDuration
-                               delay:HUMTickAnimationDelay * i];
+                        withDuration:self.tickMovementAnimationDuration
+                               delay:self.nextTickAnimationDelay * i];
         }
     }
 }

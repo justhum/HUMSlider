@@ -36,4 +36,18 @@
 ///The color to use as the desaturated color. Defaults to light gray.
 @property (nonatomic) UIColor *desaturatedColor;
 
+#pragma mark - Configurable Animation Durations
+
+///How long it should take to adjust tick alpha. Defaults to .2 seconds.
+@property (nonatomic) NSTimeInterval tickAlphaAnimationDuration;
+
+///How long it takes most ticks to pop up from hidden. Defaults to .5 seconds.
+@property (nonatomic) NSTimeInterval tickMovementAnimationDuration;
+
+///How long it takes the tick on either side of the middle tick pop up from hidden. Defaults to .35 seconds.
+@property (nonatomic) NSTimeInterval secondTickMovementAndimationDuration;
+
+///How long to wait between animating secondary ticks. Defaults to 0.025 seconds. 
+@property (nonatomic) NSTimeInterval nextTickAnimationDelay;
+
 @end
