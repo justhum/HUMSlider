@@ -77,6 +77,12 @@
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
     self.programmaticSlider.desaturatedColor = [[UIColor brownColor] colorWithAlphaComponent:0.2f];
     self.programmaticSlider.tickColor = [UIColor orangeColor];
+    
+    // Also some slower times to make this obvious.
+    self.programmaticSlider.tickAlphaAnimationDuration = 0.7;
+    self.programmaticSlider.tickMovementAnimationDuration = 1.0;
+    self.programmaticSlider.secondTickMovementAndimationDuration = 0.8;
+    self.programmaticSlider.nextTickAnimationDelay = 0.1;
 }
 
 #pragma mark - Convenience images
