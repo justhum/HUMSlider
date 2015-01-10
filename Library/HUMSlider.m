@@ -24,8 +24,9 @@ static CGFloat const HUMTickWidth = 1;
 
 @interface HUMSlider ()
 @property (nonatomic) NSArray *tickViews;
-@property (nonatomic) NSArray *tickBottomConstraints;
-@property (nonatomic) NSArray *tickLeftConstraints;
+@property (nonatomic) NSArray *allTickBottomConstraints;
+@property (nonatomic) NSArray *leftTickRightConstraints;
+@property (nonatomic) NSArray *rightTickLeftConstraints;
 
 @property (nonatomic) UIImage *leftTemplate;
 @property (nonatomic) UIImage *rightTemplate;
@@ -92,8 +93,8 @@ static CGFloat const HUMTickWidth = 1;
     }
     
     self.tickViews = nil;
-    self.tickLeftConstraints = nil;
-    self.tickBottomConstraints = nil;
+    self.leftTickRightConstraints = nil;
+    self.allTickBottomConstraints = nil;
     
     [self layoutIfNeeded];
 }
@@ -105,6 +106,7 @@ static CGFloat const HUMTickWidth = 1;
         UIView *tick = [[UIView alloc] init];
         tick.backgroundColor = self.tickColor;
         tick.alpha = 0;
+        tick.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:tick];
         [self sendSubviewToBack:tick];
         [tickBuilder addObject:tick];
@@ -114,74 +116,113 @@ static CGFloat const HUMTickWidth = 1;
     [self setupTicksAutolayout];
 }
 
+#pragma mark Autolayout
+
 - (void)setupTicksAutolayout
 {
     NSMutableArray *bottoms = [NSMutableArray array];
     NSMutableArray *lefts = [NSMutableArray array];
-    for (NSInteger i = 0; i < self.tickViews.count; i++) {
-        UIView *currentTick = self.tickViews[i];
-        currentTick.translatesAutoresizingMaskIntoConstraints = NO;
+    NSMutableArray *rights = [NSMutableArray array];
+    
+    UIView *middleTick = self.tickViews[self.middleTickIndex];
+    [self pinTickWidthAndHeight:middleTick];
+    NSLayoutConstraint *midBottom = [self pinTickBottom:middleTick];
+    [bottoms addObject:midBottom];
+
+    //Pin the middle tick to the middle of the slider.
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:middleTick
+                                                     attribute:NSLayoutAttributeCenterX
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeCenterX
+                                                    multiplier:1
+                                                      constant:0]];
+    
+    for (NSInteger i = 0; i < self.middleTickIndex; i++) {
+        NSInteger previousLowest = self.middleTickIndex - i;
+        NSInteger previousHighest = self.middleTickIndex + i;
         
-        UIView *previousTick;
-        if (i != 0) {
-            previousTick = self.tickViews[i - 1];
-        }
+        NSInteger nextLowest = self.middleTickIndex - (i + 1);
+        NSInteger nextHighest = self.middleTickIndex + (i + 1);
         
-        // Pin width of tick
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:currentTick
-                                                         attribute:NSLayoutAttributeWidth
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:nil
-                                                         attribute:0
-                                                        multiplier:1
-                                                          constant:HUMTickWidth]];
-        // Pin height of tick
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:currentTick
-                                                         attribute:NSLayoutAttributeHeight
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:nil
-                                                         attribute:0
-                                                        multiplier:1
-                                                          constant:HUMTickHeight]];
+        UIView *nextToLeft = self.tickViews[nextLowest];
+        UIView *nextToRight = self.tickViews[nextHighest];
         
-        // Pin bottom of tick to top of track.
-        NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:currentTick
-                                                                  attribute:NSLayoutAttributeBottom
-                                                                  relatedBy:NSLayoutRelationEqual
-                                                                     toItem:self
-                                                                  attribute:NSLayoutAttributeBottom
-                                                                 multiplier:1
-                                                                   constant:[self tickOutPosition]];
-        [self addConstraint:bottom];
-        [bottoms addObject:bottom];
+        UIView *previousToLeft = self.tickViews[previousLowest];
+        UIView *previousToRight = self.tickViews[previousHighest];
         
-        NSLayoutConstraint *left;
+        //Pin widths, heights, and bottoms.
+        [self pinTickWidthAndHeight:nextToLeft];
+        NSLayoutConstraint *leftBottom = [self pinTickBottom:nextToLeft];
+        [bottoms insertObject:leftBottom atIndex:0];
         
-        if (previousTick) {
-            left = [NSLayoutConstraint constraintWithItem:currentTick
-                                                attribute:NSLayoutAttributeLeading
-                                                relatedBy:NSLayoutRelationEqual
-                                                   toItem:previousTick
-                                                attribute:NSLayoutAttributeTrailing
-                                               multiplier:1
-                                                 constant:self.segmentWidth - HUMTickWidth];
-        } else {
-            left = [NSLayoutConstraint constraintWithItem:currentTick
-                                                attribute:NSLayoutAttributeLeading
-                                                relatedBy:NSLayoutRelationEqual
-                                                   toItem:self
-                                                attribute:NSLayoutAttributeLeading
-                                               multiplier:1
-                                                 constant:self.halfSegment - HUMTickWidth];
-        }
+        [self pinTickWidthAndHeight:nextToRight];
+        NSLayoutConstraint *rightBottom = [self pinTickBottom:nextToRight];
+        [bottoms addObject:rightBottom];
         
+        //Pin the right of the next leftwards tick to the previous leftwards tick
+        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:nextToLeft
+                                                                attribute:NSLayoutAttributeRight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:previousToLeft
+                                                                attribute:NSLayoutAttributeLeft
+                                                               multiplier:1
+                                                                 constant:-(self.segmentWidth - HUMTickWidth)];
         [self addConstraint:left];
         [lefts addObject:left];
+        
+        //Pin the left of the next rightwards tick to the previous rightwards tick.
+        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:nextToRight
+                                                                 attribute:NSLayoutAttributeLeft
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:previousToRight
+                                                                 attribute:NSLayoutAttributeRight
+                                                                multiplier:1
+                                                                  constant:(self.segmentWidth - HUMTickWidth)];
+        [self addConstraint:right];
+        [rights addObject:right];
+        
     }
     
-    self.tickBottomConstraints = bottoms;
-    self.tickLeftConstraints = lefts;
+    self.allTickBottomConstraints = bottoms;
+    self.leftTickRightConstraints = lefts;
+    self.rightTickLeftConstraints = rights;
+    
     [self layoutIfNeeded];
+}
+
+- (void)pinTickWidthAndHeight:(UIView *)currentTick
+{
+    // Pin width of tick
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:currentTick
+                                                     attribute:NSLayoutAttributeWidth
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:nil
+                                                     attribute:0
+                                                    multiplier:1
+                                                      constant:HUMTickWidth]];
+    // Pin height of tick
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:currentTick
+                                                     attribute:NSLayoutAttributeHeight
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:nil
+                                                     attribute:0
+                                                    multiplier:1
+                                                      constant:HUMTickHeight]];
+}
+
+- (NSLayoutConstraint *)pinTickBottom:(UIView *)currentTick
+{
+    // Pin bottom of tick to top of track.
+    NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:currentTick
+                                                              attribute:NSLayoutAttributeBottom
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:self
+                                                              attribute:NSLayoutAttributeBottom
+                                                             multiplier:1
+                                                               constant:[self tickOutPosition]];
+    [self addConstraint:bottom];
+    return bottom;
 }
 
 #pragma mark - Images
@@ -348,16 +389,14 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)updateLeftTickConstraintsIfNeeded
 {
-    NSLayoutConstraint *firstLeft = self.tickLeftConstraints.firstObject;
-    if (firstLeft.constant != (self.trackXOrigin + self.halfSegment - HUMTickWidth)) {
-        // Need to be relaid out
-        for (NSInteger i = 0; i < self.tickLeftConstraints.count; i++) {
-            NSLayoutConstraint *left = self.tickLeftConstraints[i];
-            if (i == 0) {
-                left.constant = self.trackXOrigin + self.halfSegment - HUMTickWidth;
-            } else {
-                left.constant = self.segmentWidth - HUMTickWidth;
-            }
+    NSLayoutConstraint *firstLeft = self.leftTickRightConstraints.firstObject;
+    
+    if (firstLeft.constant != (self.segmentWidth - HUMTickWidth)) {
+        for (NSInteger i = 0; i < self.middleTickIndex; i++) {
+            NSLayoutConstraint *leftConstraint = self.rightTickLeftConstraints[i];
+            NSLayoutConstraint *rightConstraint = self.leftTickRightConstraints[i];
+            leftConstraint.constant = (self.segmentWidth - HUMTickWidth);
+            rightConstraint.constant = -(self.segmentWidth - HUMTickWidth);
         }
         
         [self layoutIfNeeded];
@@ -586,7 +625,7 @@ static CGFloat const HUMTickWidth = 1;
 {
     
     
-    NSLayoutConstraint *constraint = self.tickBottomConstraints[index];
+    NSLayoutConstraint *constraint = self.allTickBottomConstraints[index];
     constraint.constant = yOrigin;
     
     
@@ -619,11 +658,6 @@ static CGFloat const HUMTickWidth = 1;
 {
     CGRect trackRect = [self trackRectForBounds:self.bounds];
     return floorf(CGRectGetWidth(trackRect) / self.sectionCount);
-}
-
-- (CGFloat)halfSegment
-{
-    return self.segmentWidth / 2.0f;
 }
 
 - (NSInteger)middleTickIndex
