@@ -3,7 +3,7 @@ HUMSlider
 
 A slider control with auto-appearing ticks and saturating images at each end. Straight from the codebase of [Hum.](http://justhum.com)
 
-// GIF
+![](slider_in_action.gif)
 
 ##Setup
 
