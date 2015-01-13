@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.homepage     = "http://www.designatednerd.com"
   s.license      = 'MIT'
   s.author       = { "Ellen Shapiro" => "designatednerd@gmail.com" }
-  s.source       = { :git => "https://github.com/justhum/HUMSlider.git", :tag => s.version.to_s }
+  s.source       = { :git => "https://github.com/just-hum/HUMSlider.git", :tag => s.version.to_s }
 
   s.platform     = :ios, '7.0'
   s.ios.deployment_target = '7.0'
