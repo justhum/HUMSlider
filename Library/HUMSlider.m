@@ -44,7 +44,7 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)commonInit
 {
-    //Set default values.
+    // Set default values.
     self.sectionCount = 9;
     self.tickAlphaAnimationDuration = HUMTickAlphaDuration;
     self.tickMovementAnimationDuration = HUMTickMovementDuration;
@@ -55,7 +55,7 @@ static CGFloat const HUMTickWidth = 1;
     self.desaturatedColor = [UIColor lightGrayColor];
     self.tickColor = [UIColor darkGrayColor];
     
-    //Add self as target.
+    // Add self as target.
     [self addTarget:self
              action:@selector(sliderAdjusted)
    forControlEvents:UIControlEventValueChanged];
@@ -133,7 +133,7 @@ static CGFloat const HUMTickWidth = 1;
     NSLayoutConstraint *midBottom = [self pinTickBottom:middleTick];
     [bottoms addObject:midBottom];
 
-    //Pin the middle tick to the middle of the slider.
+    // Pin the middle tick to the middle of the slider.
     [self addConstraint:[NSLayoutConstraint constraintWithItem:middleTick
                                                      attribute:NSLayoutAttributeCenterX
                                                      relatedBy:NSLayoutRelationEqual
@@ -155,7 +155,7 @@ static CGFloat const HUMTickWidth = 1;
         UIView *previousToLeft = self.tickViews[previousLowest];
         UIView *previousToRight = self.tickViews[previousHighest];
         
-        //Pin widths, heights, and bottoms.
+        // Pin widths, heights, and bottoms.
         [self pinTickWidthAndHeight:nextToLeft];
         NSLayoutConstraint *leftBottom = [self pinTickBottom:nextToLeft];
         [bottoms insertObject:leftBottom atIndex:0];
@@ -164,7 +164,7 @@ static CGFloat const HUMTickWidth = 1;
         NSLayoutConstraint *rightBottom = [self pinTickBottom:nextToRight];
         [bottoms addObject:rightBottom];
         
-        //Pin the right of the next leftwards tick to the previous leftwards tick
+        // Pin the right of the next leftwards tick to the previous leftwards tick
         NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:nextToLeft
                                                                 attribute:NSLayoutAttributeRight
                                                                 relatedBy:NSLayoutRelationEqual
@@ -175,7 +175,7 @@ static CGFloat const HUMTickWidth = 1;
         [self addConstraint:left];
         [lefts addObject:left];
         
-        //Pin the left of the next rightwards tick to the previous rightwards tick.
+        // Pin the left of the next rightwards tick to the previous rightwards tick.
         NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:nextToRight
                                                                  attribute:NSLayoutAttributeLeft
                                                                  relatedBy:NSLayoutRelationEqual
@@ -233,7 +233,7 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)setupSaturatedAndDesaturatedImageViews
 {
-    //Left
+    // Left
     self.leftDesaturatedImageView = [[UIImageView alloc] init];
     self.leftDesaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.leftDesaturatedImageView];
@@ -243,7 +243,7 @@ static CGFloat const HUMTickWidth = 1;
     self.leftSaturatedImageView.alpha = 0.0f;
     [self addSubview:self.leftSaturatedImageView];
 
-    //Right
+    // Right
     self.rightDesaturatedImageView = [[UIImageView alloc] init];
     self.rightDesaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.rightDesaturatedImageView];
@@ -263,7 +263,7 @@ static CGFloat const HUMTickWidth = 1;
     [self pinView1Center:self.leftSaturatedImageView toView2Center:self.leftDesaturatedImageView];
     [self pinView1Center:self.rightSaturatedImageView toView2Center:self.rightDesaturatedImageView];
     
-    //Reset colors
+    // Reset colors
     self.saturatedColor = self.saturatedColor;
     self.desaturatedColor = self.desaturatedColor;
 }
@@ -574,7 +574,7 @@ static CGFloat const HUMTickWidth = 1;
     CGFloat origin;
     CGFloat alpha;
     
-    if (inPosition) { // ticks are out, coming in
+    if (inPosition) { // Ticks are out, coming in
         alpha = 1;
         origin = [self tickInNotPoppedPositon];
     } else { // Ticks are in, coming out.
