@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.description  = <<-DESC
                    A UISlider with ticks and auto-saturating images. 
                    DESC
-  s.homepage     = "http://www.designatednerd.com"
+  s.homepage     = "http://justhum.com"
   s.license      = 'MIT'
   s.author       = { "Ellen Shapiro" => "designatednerd@gmail.com" }
   s.source       = { :git => "https://github.com/just-hum/HUMSlider.git", :tag => s.version.to_s }
