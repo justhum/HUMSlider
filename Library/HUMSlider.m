@@ -132,7 +132,7 @@ static CGFloat const HUMTickWidth = 1;
     [self pinTickWidthAndHeight:middleTick];
     NSLayoutConstraint *midBottom = [self pinTickBottom:middleTick];
     [bottoms addObject:midBottom];
-
+    
     // Pin the middle tick to the middle of the slider.
     [self addConstraint:[NSLayoutConstraint constraintWithItem:middleTick
                                                      attribute:NSLayoutAttributeCenterX
@@ -242,7 +242,7 @@ static CGFloat const HUMTickWidth = 1;
     self.leftSaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
     self.leftSaturatedImageView.alpha = 0.0f;
     [self addSubview:self.leftSaturatedImageView];
-
+    
     // Right
     self.rightDesaturatedImageView = [[UIImageView alloc] init];
     self.rightDesaturatedImageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -367,12 +367,12 @@ static CGFloat const HUMTickWidth = 1;
 - (void)pinView1Center:(UIView *)view1 toView2Center:(UIView *)view2
 {
     [self addConstraint:[NSLayoutConstraint constraintWithItem:view1
-                                                    attribute:NSLayoutAttributeCenterY
-                                                    relatedBy:NSLayoutRelationEqual
-                                                       toItem:view2
-                                                    attribute:NSLayoutAttributeCenterY
-                                                   multiplier:1
-                                                     constant:0]];
+                                                     attribute:NSLayoutAttributeCenterY
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:view2
+                                                     attribute:NSLayoutAttributeCenterY
+                                                    multiplier:1
+                                                      constant:0]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:view1
                                                      attribute:NSLayoutAttributeCenterX
                                                      relatedBy:NSLayoutRelationEqual
@@ -470,6 +470,35 @@ static CGFloat const HUMTickWidth = 1;
     _desaturatedColor = desaturatedColor;
     self.leftDesaturatedImageView.tintColor = _desaturatedColor;
     self.rightDesaturatedImageView.tintColor = _desaturatedColor;
+}
+
+- (void)setSaturatedColor:(UIColor *)saturatedColor forSide:(HUMSliderSide)side
+{
+    [self imageViewForSide:side saturated:YES].tintColor = saturatedColor;
+}
+
+- (UIColor*)saturatedColorForSide:(HUMSliderSide)side
+{
+    return [self imageViewForSide:side saturated:YES].tintColor;
+}
+
+- (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side
+{
+    [self imageViewForSide:side saturated:NO].tintColor = desaturatedColor;
+}
+
+- (UIColor*)desaturatedColorForSide:(HUMSliderSide)side
+{
+    return [self imageViewForSide:side saturated:NO].tintColor;
+}
+
+- (UIImageView*)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
+{
+    if (side == HUMSliderSideLeft) {
+        return saturated?self.leftSaturatedImageView:self.leftDesaturatedImageView;
+    } else {
+        return saturated?self.rightSaturatedImageView:self.rightDesaturatedImageView;
+    }
 }
 
 - (void)setTickColor:(UIColor *)tickColor

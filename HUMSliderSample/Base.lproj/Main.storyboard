@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
@@ -23,20 +23,27 @@
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="6f5-Gz-sSz" customClass="HUMSlider">
                                 <rect key="frame" x="18" y="90" width="564" height="31"/>
                             </slider>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="vXj-d7-wfg" customClass="HUMSlider">
+                                <rect key="frame" x="18" y="140" width="564" height="31"/>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="vXj-d7-wfg" firstAttribute="trailing" secondItem="6f5-Gz-sSz" secondAttribute="trailing" id="3l0-TE-adf"/>
                             <constraint firstItem="yrA-qL-07K" firstAttribute="leading" secondItem="6f5-Gz-sSz" secondAttribute="leading" id="8JQ-FV-AeE"/>
+                            <constraint firstItem="vXj-d7-wfg" firstAttribute="leading" secondItem="6f5-Gz-sSz" secondAttribute="leading" id="NvP-Ei-aBe"/>
                             <constraint firstItem="yrA-qL-07K" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="20" id="Ts5-LO-Ytc"/>
                             <constraint firstItem="yrA-qL-07K" firstAttribute="trailing" secondItem="6f5-Gz-sSz" secondAttribute="trailing" id="ZVz-Je-Pky"/>
                             <constraint firstItem="6f5-Gz-sSz" firstAttribute="top" secondItem="yrA-qL-07K" secondAttribute="bottom" constant="20" id="enc-uT-OgX"/>
                             <constraint firstAttribute="trailing" secondItem="yrA-qL-07K" secondAttribute="trailing" constant="20" id="qx6-F4-c5c"/>
                             <constraint firstItem="yrA-qL-07K" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="20" id="rsC-JL-G3Q"/>
+                            <constraint firstItem="vXj-d7-wfg" firstAttribute="top" secondItem="6f5-Gz-sSz" secondAttribute="bottom" constant="20" id="vVJ-6q-fEa"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="noImageSliderFromNib" destination="6f5-Gz-sSz" id="joa-jm-E78"/>
                         <outlet property="sliderFromNib" destination="yrA-qL-07K" id="1Gz-Dr-uXr"/>
+                        <outlet property="sliderFromNibSideColors" destination="vXj-d7-wfg" id="pap-zQ-otp"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>

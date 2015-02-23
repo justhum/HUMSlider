@@ -13,6 +13,7 @@
 @interface ViewController()
 @property (nonatomic, weak) IBOutlet HUMSlider *sliderFromNib;
 @property (nonatomic, weak) IBOutlet HUMSlider *noImageSliderFromNib;
+@property (weak, nonatomic) IBOutlet HUMSlider *sliderFromNibSideColors;
 @property (nonatomic) HUMSlider *programmaticSlider;
 
 @end
@@ -22,10 +23,19 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
+    
     // This uses default values for everything except max and min images.
     self.sliderFromNib.minimumValueImage = [self sadImage];
     self.sliderFromNib.maximumValueImage = [self happyImage];
+    
+    // This uses custom clors for min and max images.
+    self.sliderFromNibSideColors.minimumValueImage = [self sadImage];
+    self.sliderFromNibSideColors.maximumValueImage = [self happyImage];
+    [self.sliderFromNibSideColors setSaturatedColor:[UIColor redColor] forSide:HUMSliderSideLeft];
+    [self.sliderFromNibSideColors setSaturatedColor:[UIColor greenColor] forSide:HUMSliderSideRight];
+    
+    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor lightGrayColor] forSide:HUMSliderSideLeft];
+    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor darkGrayColor] forSide:HUMSliderSideRight];
     
     // This uses default values for everything except the track color, and
     // does not use any images.
@@ -44,12 +54,12 @@
     
     // Pin left to top slider left
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.programmaticSlider
-                                                         attribute:NSLayoutAttributeLeft
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.sliderFromNib
-                                                         attribute:NSLayoutAttributeLeft
-                                                        multiplier:1
-                                                          constant:0]];
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.sliderFromNib
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1
+                                                           constant:0]];
     
     // Pin right to top slider right
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.programmaticSlider
@@ -60,11 +70,11 @@
                                                          multiplier:1
                                                            constant:0]];
     
-    // Pin Top to bottom of no-image slider.
+    // Pin Top to bottom of different side colors slider.
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.programmaticSlider
                                                           attribute:NSLayoutAttributeTop
                                                           relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.noImageSliderFromNib
+                                                             toItem:self.sliderFromNibSideColors
                                                           attribute:NSLayoutAttributeBottom
                                                          multiplier:1
                                                            constant:0]];
@@ -83,7 +93,7 @@
     
     // This thumb has some space at the top to balance out the shadow built into it.
     self.programmaticSlider.pointAdjustmentForCustomThumb = 8;
-        
+    
     // Use some crazypants colors to make this obvious
     self.programmaticSlider.saturatedColor = [UIColor blueColor];
     self.programmaticSlider.desaturatedColor = [[UIColor brownColor] colorWithAlphaComponent:0.2f];
