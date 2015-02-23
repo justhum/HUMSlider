@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSUInteger, HUMSliderSide) {
+    HUMSliderSideLeft,
+    HUMSliderSideRight
+};
+
 /**
  * A slider which pops up ticks and saturates/desaturates images when the user adjusts
  * a slider for better feedback to the user about their adjustment.
@@ -22,7 +27,7 @@
 ///The color of the ticks you wish to pop up. Defaults to dark gray.
 @property (nonatomic) UIColor *tickColor;
 
-///How many sections of ticks should be created. NOTE: Needs to be an odd number or math falls apart. Defaults to 9. 
+///How many sections of ticks should be created. NOTE: Needs to be an odd number or math falls apart. Defaults to 9.
 @property (nonatomic) NSUInteger sectionCount;
 
 ///How many points the tick popping should be adjusted for a custom thumbnail image to account for any space at the top (for example, to balance out a custom shadow).
@@ -47,7 +52,41 @@
 ///How long it takes the tick on either side of the middle tick pop up from hidden. Defaults to .35 seconds.
 @property (nonatomic) NSTimeInterval secondTickMovementAndimationDuration;
 
-///How long to wait between animating secondary ticks. Defaults to 0.025 seconds. 
+///How long to wait between animating secondary ticks. Defaults to 0.025 seconds.
 @property (nonatomic) NSTimeInterval nextTickAnimationDelay;
+
+/**
+ *  The color to use as the fully-saturated color on selected side. Defaults to red.
+ *
+ *  @param saturatedColor color to use
+ *  @param side           HUMSliderSide (left or right)
+ */
+- (void)setSaturatedColor:(UIColor *)saturatedColor forSide:(HUMSliderSide)side;
+
+/**
+ *  Returs used fully-saturated color for selected side.
+ *
+ *  @param side HUMSliderSide (left or right)
+ *
+ *  @return UIColor for selected side
+ */
+- (UIColor*)saturatedColorForSide:(HUMSliderSide)side;
+
+/**
+ *  The color to use as the desaturated color on selected side. Defaults to light gray.
+ *
+ *  @param saturatedColor color to use
+ *  @param side           HUMSliderSide (left or right)
+ */
+- (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side;
+
+/**
+ *  Returs used desaturated color for selected side.
+ *
+ *  @param side HUMSliderSide (left or right)
+ *
+ *  @return UIColor for selected side
+ */
+- (UIColor*)desaturatedColorForSide:(HUMSliderSide)side;
 
 @end
