@@ -28,14 +28,19 @@
     self.sliderFromNib.minimumValueImage = [self sadImage];
     self.sliderFromNib.maximumValueImage = [self happyImage];
     
-    // This uses custom clors for min and max images.
+    // This uses custom colors on the images for each side.
     self.sliderFromNibSideColors.minimumValueImage = [self sadImage];
     self.sliderFromNibSideColors.maximumValueImage = [self happyImage];
-    [self.sliderFromNibSideColors setSaturatedColor:[UIColor redColor] forSide:HUMSliderSideLeft];
-    [self.sliderFromNibSideColors setSaturatedColor:[UIColor greenColor] forSide:HUMSliderSideRight];
     
-    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor lightGrayColor] forSide:HUMSliderSideLeft];
-    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor darkGrayColor] forSide:HUMSliderSideRight];
+    [self.sliderFromNibSideColors setSaturatedColor:[UIColor redColor]
+                                            forSide:HUMSliderSideLeft];
+    [self.sliderFromNibSideColors setSaturatedColor:[UIColor greenColor]
+                                            forSide:HUMSliderSideRight];
+    
+    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor lightGrayColor]
+                                              forSide:HUMSliderSideLeft];
+    [self.sliderFromNibSideColors setDesaturatedColor:[UIColor darkGrayColor]
+                                              forSide:HUMSliderSideRight];
     
     // This uses default values for everything except the track color, and
     // does not use any images.
