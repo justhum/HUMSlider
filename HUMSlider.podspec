@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "HUMSlider"
-  s.version      = '1.0.0'
+  s.version      = '1.1.0'
   s.summary      = "HUMSlider"
   s.description  = <<-DESC
                    A UISlider with ticks and auto-saturating images. 
