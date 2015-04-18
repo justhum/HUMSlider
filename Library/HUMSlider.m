@@ -32,9 +32,13 @@ static CGFloat const HUMTickWidth = 1;
 @property (nonatomic) UIImage *rightTemplate;
 
 @property (nonatomic) UIImageView *leftSaturatedImageView;
+@property (nonatomic) UIColor *leftSaturatedColor;
 @property (nonatomic) UIImageView *leftDesaturatedImageView;
+@property (nonatomic) UIColor *leftDesaturatedColor;
 @property (nonatomic) UIImageView *rightSaturatedImageView;
+@property (nonatomic) UIColor *rightSaturatedColor;
 @property (nonatomic) UIImageView *rightDesaturatedImageView;
+@property (nonatomic) UIColor *rightDesaturatedColor;
 
 @end
 
@@ -51,8 +55,10 @@ static CGFloat const HUMTickWidth = 1;
     self.secondTickMovementAndimationDuration = HUMSecondTickDuration;
     self.nextTickAnimationDelay = HUMTickAnimationDelay;
     
+    //These will set the side colors.
     self.saturatedColor = [UIColor redColor];
     self.desaturatedColor = [UIColor lightGrayColor];
+    
     self.tickColor = [UIColor darkGrayColor];
     
     // Add self as target.
@@ -461,35 +467,69 @@ static CGFloat const HUMTickWidth = 1;
 - (void)setSaturatedColor:(UIColor *)saturatedColor
 {
     _saturatedColor = saturatedColor;
-    self.leftSaturatedImageView.tintColor = _saturatedColor;
-    self.rightSaturatedImageView.tintColor = _saturatedColor;
+    [self setSaturatedColor:saturatedColor forSide:HUMSliderSideLeft];
+    [self setSaturatedColor:saturatedColor forSide:HUMSliderSideRight];
 }
 
 - (void)setDesaturatedColor:(UIColor *)desaturatedColor
 {
     _desaturatedColor = desaturatedColor;
-    self.leftDesaturatedImageView.tintColor = _desaturatedColor;
-    self.rightDesaturatedImageView.tintColor = _desaturatedColor;
+    [self setDesaturatedColor:desaturatedColor forSide:HUMSliderSideLeft];
+    [self setDesaturatedColor:desaturatedColor forSide:HUMSliderSideRight];
 }
+
+#pragma mark - Setters for colors on different sides. 
 
 - (void)setSaturatedColor:(UIColor *)saturatedColor forSide:(HUMSliderSide)side
 {
+    switch (side) {
+        case HUMSliderSideLeft:
+            self.leftSaturatedColor = saturatedColor;
+            break;
+        case HUMSliderSideRight:
+            self.rightSaturatedColor = saturatedColor;
+            break;
+    }
+    
     [self imageViewForSide:side saturated:YES].tintColor = saturatedColor;
 }
 
 - (UIColor *)saturatedColorForSide:(HUMSliderSide)side
 {
-    return [self imageViewForSide:side saturated:YES].tintColor;
+    switch (side) {
+        case HUMSliderSideLeft:
+            return self.leftSaturatedColor;
+            break;
+        case HUMSliderSideRight:
+            return self.rightSaturatedColor;
+            break;
+    }
 }
 
 - (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side
 {
+    switch (side) {
+        case HUMSliderSideLeft:
+            self.leftDesaturatedColor = desaturatedColor;
+            break;
+        case HUMSliderSideRight:
+            self.rightDesaturatedColor = desaturatedColor;
+            break;
+    }
+
     [self imageViewForSide:side saturated:NO].tintColor = desaturatedColor;
 }
 
 - (UIColor *)desaturatedColorForSide:(HUMSliderSide)side
 {
-    return [self imageViewForSide:side saturated:NO].tintColor;
+    switch (side) {
+        case HUMSliderSideLeft:
+            return self.leftDesaturatedColor;
+            break;
+        case HUMSliderSideRight:
+            return self.rightDesaturatedColor;
+            break;
+    }
 }
 
 - (UIImageView *)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
