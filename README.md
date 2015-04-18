@@ -49,6 +49,7 @@ Full code is available in the sample app included in this repo.
 - Images passed in as min/max images will automatically be set to use `UIImageRenderingModeAlwaysTemplate` in order to facilitate the saturation and desaturation of the image using tint colors.
 - Images will perform best when they're un-styled. Let the code set the colors. 
 - If no min/max images are passed in, the slider track will take up the full length of the control. 
+- If you set the `saturatedColor` or `desaturatedColor` properties, it will set the same color on both sides. Use the `setSaturatedColor:forSide:` and `setDesaturatedColor:forSide` to set separate colors per side. 
 
 
 #Contributors
