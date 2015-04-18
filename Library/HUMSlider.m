@@ -534,10 +534,21 @@ static CGFloat const HUMTickWidth = 1;
 
 - (UIImageView *)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
 {
-    if (side == HUMSliderSideLeft) {
-        return saturated?self.leftSaturatedImageView:self.leftDesaturatedImageView;
-    } else {
-        return saturated?self.rightSaturatedImageView:self.rightDesaturatedImageView;
+    switch (side) {
+        case HUMSliderSideLeft:
+            if (saturated) {
+                return self.leftSaturatedImageView;
+            } else {
+                return self.leftDesaturatedImageView;
+            }
+            break;
+        case HUMSliderSideRight:
+            if (saturated) {
+                return self.rightSaturatedImageView;
+            } else {
+                return self.rightDesaturatedImageView;
+            }
+            break;
     }
 }
 
