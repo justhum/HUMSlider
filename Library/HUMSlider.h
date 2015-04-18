@@ -70,7 +70,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *
  *  @return UIColor for selected side
  */
-- (UIColor*)saturatedColorForSide:(HUMSliderSide)side;
+- (UIColor *)saturatedColorForSide:(HUMSliderSide)side;
 
 /**
  *  The color to use as the desaturated color on selected side. Defaults to light gray.
@@ -87,6 +87,6 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *
  *  @return UIColor for selected side
  */
-- (UIColor*)desaturatedColorForSide:(HUMSliderSide)side;
+- (UIColor *)desaturatedColorForSide:(HUMSliderSide)side;
 
 @end

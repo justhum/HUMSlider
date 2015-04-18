@@ -477,7 +477,7 @@ static CGFloat const HUMTickWidth = 1;
     [self imageViewForSide:side saturated:YES].tintColor = saturatedColor;
 }
 
-- (UIColor*)saturatedColorForSide:(HUMSliderSide)side
+- (UIColor *)saturatedColorForSide:(HUMSliderSide)side
 {
     return [self imageViewForSide:side saturated:YES].tintColor;
 }
@@ -487,12 +487,12 @@ static CGFloat const HUMTickWidth = 1;
     [self imageViewForSide:side saturated:NO].tintColor = desaturatedColor;
 }
 
-- (UIColor*)desaturatedColorForSide:(HUMSliderSide)side
+- (UIColor *)desaturatedColorForSide:(HUMSliderSide)side
 {
     return [self imageViewForSide:side saturated:NO].tintColor;
 }
 
-- (UIImageView*)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
+- (UIImageView *)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
 {
     if (side == HUMSliderSideLeft) {
         return saturated?self.leftSaturatedImageView:self.leftDesaturatedImageView;
