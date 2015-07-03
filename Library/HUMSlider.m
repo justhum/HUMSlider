@@ -67,7 +67,7 @@ static CGFloat const HUMTickWidth = 1;
    forControlEvents:UIControlEventValueChanged];
 }
 
-- (id)init
+- (instancetype)init
 {
     if (self = [super init]) {
         [self commonInit];
@@ -76,7 +76,7 @@ static CGFloat const HUMTickWidth = 1;
     return self;
 }
 
-- (id)initWithFrame:(CGRect)frame
+- (instancetype)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
@@ -85,7 +85,7 @@ static CGFloat const HUMTickWidth = 1;
     return self;
 }
 
-- (id)initWithCoder:(NSCoder *)aDecoder
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
 {
     if (self = [super initWithCoder:aDecoder]) {
         [self commonInit];
