@@ -19,10 +19,25 @@ static CGFloat const HUMTickOutToInDifferential = 8;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
-static CGFloat const HUMTickHeight = 6;
-static CGFloat const HUMTickWidth = 1;
+static CGFloat const HUMTickHeight = 8;
+static CGFloat const HUMTickWidth = 2;
+
+@implementation Tick
+// Constructor for a tick
+- (id)initWithPosition:(double)position {
+    NSAssert(position >= 0 && position <= 1, @"Position must be between 0 and 1");
+    self = [super init];
+    if (self) {
+        self.position = position;
+    }
+    return self;
+}
+@end
 
 @interface HUMSlider ()
+
+
+
 @property (nonatomic) NSArray *tickViews;
 @property (nonatomic) NSArray *allTickBottomConstraints;
 @property (nonatomic) NSArray *leftTickRightConstraints;
@@ -54,6 +69,9 @@ static CGFloat const HUMTickWidth = 1;
     self.tickMovementAnimationDuration = HUMTickMovementDuration;
     self.secondTickMovementAndimationDuration = HUMSecondTickDuration;
     self.nextTickAnimationDelay = HUMTickAnimationDelay;
+    
+    //Private var init
+    self.ticks = [NSMutableArray new];
     
     //These will set the side colors.
     self.saturatedColor = [UIColor redColor];
@@ -95,6 +113,36 @@ static CGFloat const HUMTickWidth = 1;
 }
 
 #pragma mark - Ticks
+
+- (void)addTick:(Tick*)tick {
+    //[_ticks addObject:tick];
+    
+    if ([_ticks count] == 0) {
+        [_ticks addObject:tick];
+    }
+    else {
+        uint index = 1;
+        for (Tick *tick_itr in _ticks) {
+            if (tick_itr.position < tick.position) {
+                [_ticks insertObject:tick atIndex:index-1];
+                break;
+            }
+            index ++;
+        }
+    }
+
+
+    
+    //NSSortDescriptor *sortDescriptor;
+    //sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"position"
+                                                 ascending:YES];
+#warning - this shit doesn't sort!
+    //_ticks = [[_ticks sortedArrayUsingDescriptors:@[sortDescriptor]] mutableCopy];
+}
+
+- (void)removeTickAtIndex:(uint)index {
+    [_ticks removeObjectAtIndex:index];
+}
 
 - (void)nukeOldTicks
 {
@@ -169,6 +217,11 @@ static CGFloat const HUMTickWidth = 1;
         [self pinTickWidthAndHeight:nextToRight];
         NSLayoutConstraint *rightBottom = [self pinTickBottom:nextToRight];
         [bottoms addObject:rightBottom];
+#warning - clean up.
+//        int multiplier = 1;
+//        if (i == 3) {
+//            multiplier = 1;
+//        }
         
         // Pin the right of the next leftwards tick to the previous leftwards tick
         NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:nextToLeft
@@ -738,6 +791,7 @@ static CGFloat const HUMTickWidth = 1;
     return CGRectGetMinY(trackRect);
 }
 
+#warning - replace this with something more dynamic.
 - (CGFloat)segmentWidth
 {
     CGRect trackRect = [self trackRectForBounds:self.bounds];

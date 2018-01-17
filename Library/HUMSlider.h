@@ -13,6 +13,11 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
     HUMSliderSideRight
 };
 
+@interface Tick : NSObject
+- (id)initWithPosition:(double)position;
+@property double position; //Number between 0 and 1 indicating the slider position of the tick.
+@end
+
 /**
  * A slider which pops up ticks and saturates/desaturates images when the user adjusts
  * a slider for better feedback to the user about their adjustment.
@@ -23,6 +28,8 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 @interface HUMSlider : UISlider
 
 #pragma mark - Ticks
+///Tick positions, specified as "Tick" objects with values between 0 and 1
+@property (atomic) NSMutableArray *ticks;
 
 ///The color of the ticks you wish to pop up. Defaults to dark gray.
 @property (nonatomic) UIColor *tickColor;
@@ -59,6 +66,20 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 #pragma mark - Setters/Getters for individual sides
 
 /**
+ *  Inserts a tick at a position.
+ *
+ *  @param tick. The tick with the set position between 0 and 1
+ */
+- (void)addTick:(Tick*)tick;
+
+/**
+ *  Removes the tick at the given index. .
+ *
+ *  @param tick. The tick with the set position between 0 and 1
+ */
+- (void)removeTickAtIndex:(uint)index;
+
+/**
  *  Sets the color to use as the fully-saturated color on selected side.
  *
  *  @param saturatedColor The UIColor to use
@@ -75,7 +96,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 /**
  *  Sets the color to use as the desaturated color on selected side.
  *
- *  @param saturatedColor The UIColor to use
+ *  @param desaturatedColor The UIColor to use
  *  @param side The side you wish to set a desaturated color upon.
  */
 - (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side;
