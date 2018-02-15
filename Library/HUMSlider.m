@@ -20,7 +20,7 @@ static CGFloat const HUMImagePadding = 8;
 
 // Sizes
 static CGFloat const HUMTickHeight = 8;
-static CGFloat const HUMTickWidth = 2;
+static CGFloat const HUMTickWidth = 1;
 
 @implementation Tick
 // Constructor for a tick
@@ -35,8 +35,6 @@ static CGFloat const HUMTickWidth = 2;
 @end
 
 @interface HUMSlider ()
-
-
 
 @property (nonatomic) NSArray *tickViews;
 @property (nonatomic) NSArray *allTickBottomConstraints;
@@ -63,6 +61,8 @@ static CGFloat const HUMTickWidth = 2;
 
 - (void)commonInit
 {
+    self.customTicksEnabled = true;
+    
     // Set default values.
     self.sectionCount = 9;
     self.tickAlphaAnimationDuration = HUMTickAlphaDuration;
@@ -71,7 +71,7 @@ static CGFloat const HUMTickWidth = 2;
     self.nextTickAnimationDelay = HUMTickAnimationDelay;
     
     //Private var init
-    self.ticks = [NSMutableArray new];
+    self.ticks = [[NSMutableArray alloc] init];
     
     //These will set the side colors.
     self.saturatedColor = [UIColor redColor];
@@ -114,30 +114,24 @@ static CGFloat const HUMTickWidth = 2;
 
 #pragma mark - Ticks
 
-- (void)addTick:(Tick*)tick {
-    //[_ticks addObject:tick];
-    
-    if ([_ticks count] == 0) {
-        [_ticks addObject:tick];
+- (void)addTick:(Tick*)tick willRefreshView:(bool)refreshView {
+    if ([self.ticks count] == 0) {
+        [self.ticks addObject:tick];
     }
     else {
-        uint index = 1;
-        for (Tick *tick_itr in _ticks) {
-            if (tick_itr.position < tick.position) {
-                [_ticks insertObject:tick atIndex:index-1];
+        unsigned long index = [self.ticks count];
+        for (Tick *tick_itr in [self.ticks reverseObjectEnumerator]) {
+            if (tick.position >= tick_itr.position) {
+                [self.ticks insertObject:tick atIndex:index];
                 break;
             }
-            index ++;
+            index --;
         }
     }
-
-
     
-    //NSSortDescriptor *sortDescriptor;
-    //sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"position"
-                                                 ascending:YES];
-#warning - this shit doesn't sort!
-    //_ticks = [[_ticks sortedArrayUsingDescriptors:@[sortDescriptor]] mutableCopy];
+    if (refreshView) {
+        [self setupTicks];
+    }
 }
 
 - (void)removeTickAtIndex:(uint)index {
@@ -157,24 +151,158 @@ static CGFloat const HUMTickWidth = 2;
     [self layoutIfNeeded];
 }
 
+- (void)refreshView {
+    [self setupTicks];
+}
+
 - (void)setupTicks
 {
+//    NSUInteger count = _ticks ? [_ticks count] : self.sectionCount;
+//    NSMutableArray *tickBuilder = [NSMutableArray array];
+//    for (NSInteger i = 0; i < count; i++) {
+//        UIView *tick = [[UIView alloc] init];
+//        tick.backgroundColor = self.tickColor;
+//        tick.alpha = 0;
+//        tick.translatesAutoresizingMaskIntoConstraints = NO;
+//        [self addSubview:tick];
+//        [self sendSubviewToBack:tick];
+//        [tickBuilder addObject:tick];
+//    }
+//
+//    self.tickViews = tickBuilder;
+    if (_customTicksEnabled && _ticks && [_ticks count] > 0) {
+        [self setupCustomTickViews];
+        [self setupTicksAutoLayoutCustomWidths];
+    }
+    else {
+        [self setupSpacedTickViews];
+        [self setupTicksAutolayout];
+    }
+}
+
+- (void)setupSpacedTickViews {
+    [self createAndAddBlankTickViewsWithCount:(int)self.sectionCount];
+}
+
+- (void)setupCustomTickViews {
+    [self createAndAddBlankTickViewsWithCount:(int)[_ticks count]];
+}
+
+- (void)createAndAddBlankTickViewsWithCount:(int)count {
     NSMutableArray *tickBuilder = [NSMutableArray array];
-    for (NSInteger i = 0; i < self.sectionCount; i++) {
-        UIView *tick = [[UIView alloc] init];
-        tick.backgroundColor = self.tickColor;
-        tick.alpha = 0;
-        tick.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:tick];
-        [self sendSubviewToBack:tick];
+    for (NSInteger i = 0; i < count; i++) {
+        UIView *tick = [self setupCommonTickViewAnddAddToSubview];
         [tickBuilder addObject:tick];
     }
     
     self.tickViews = tickBuilder;
-    [self setupTicksAutolayout];
+}
+
+- (UIView*)setupCommonTickViewAnddAddToSubview {
+    UIView *tick = [[UIView alloc] init];
+    tick.backgroundColor = self.tickColor;
+    tick.alpha = 0;
+    tick.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:tick];
+    [self sendSubviewToBack:tick];
+    return tick;
 }
 
 #pragma mark Autolayout
+
+#warning - this is called with zero tickViews and zero elements in _ticks
+- (void)setupTicksAutoLayoutCustomWidths {
+    //Store the left, right and bottom constraints for some reason
+    NSMutableArray *bottoms = [NSMutableArray array];
+    NSMutableArray *lefts = [NSMutableArray array];
+    NSMutableArray *rights = [NSMutableArray array];
+    
+    //Populate the diffs between the ticks for the contraint value. Starting at 0 and ending at 1. Array size will be N+1 where N=number of ticks. There is one extra on the outside.
+    NSMutableArray *positionDiffs = [NSMutableArray new];
+    int tickCount = (int)[self.tickViews count];
+    for (NSInteger i = 0; i <= tickCount; i++) {
+        double currentItem = i == tickCount ? [self trackWidth] : ((Tick*)self.ticks[i]).position;
+        double previousTime = i == 0 ? 0 : ((Tick*)self.ticks[i - 1]).position;
+        double zeroToOnePercentage = currentItem - previousTime;
+        double distanceDiff = zeroToOnePercentage * [self trackWidth];
+        [positionDiffs insertObject:[NSNumber numberWithDouble: distanceDiff] atIndex:(i)];
+    }
+    
+    //This is the new code to start at the first one.
+    for (NSInteger i = 0; i < [self.tickViews count]; i++) {
+        bool isFirst = i == 0 ? true : false;
+        bool isLast = i == tickCount - 1 ? true : false;
+        
+        UIView *currentItem = self.tickViews[i];
+        UIView *previousItem = isFirst ? NULL : self.tickViews[i - 1];
+        UIView *nextItem = isLast ? NULL : self.tickViews[i + 1];
+        
+        NSLayoutConstraint *bottomConstraint = [self pinTickBottom:currentItem];
+        [self addConstraint:bottomConstraint];
+        [bottoms insertObject:bottomConstraint atIndex:i];
+        [self pinTickWidthAndHeight:currentItem];
+        
+        if (isFirst) {
+            CGFloat diff = [positionDiffs[i] doubleValue];
+            // Pin the first tick to the left of the view.
+            NSLayoutConstraint *farLeft = [NSLayoutConstraint constraintWithItem:currentItem
+                                                                    attribute:NSLayoutAttributeLeft
+                                                                    relatedBy:NSLayoutRelationEqual
+                                                                       toItem:self
+                                                                    attribute:NSLayoutAttributeLeft
+                                                                   multiplier:1
+                                                                     constant:diff];
+            [self addConstraint:farLeft];
+            [lefts addObject:farLeft];
+        }
+        else { //Left constraints for all but the first element.
+            CGFloat diff = [positionDiffs[i] doubleValue];
+            // Pin the right of the next leftwards tick to the previous leftwards tick
+            NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:currentItem
+                                                                    attribute:NSLayoutAttributeRight
+                                                                    relatedBy:NSLayoutRelationEqual
+                                                                       toItem:previousItem
+                                                                    attribute:NSLayoutAttributeLeft
+                                                                   multiplier:1
+                                                                     constant:diff];
+            [self addConstraint:left];
+            [lefts addObject:left];
+        }
+        
+        if (isLast) {
+            CGFloat diff = [positionDiffs[i + 1] doubleValue];
+            // Pin the first tick to the left of the view.
+            NSLayoutConstraint *farRight = [NSLayoutConstraint constraintWithItem:currentItem
+                                                                       attribute:NSLayoutAttributeRight
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self
+                                                                       attribute:NSLayoutAttributeRight
+                                                                      multiplier:1
+                                                                        constant:diff];
+            [self addConstraint:farRight];
+            [rights addObject:farRight];
+        }
+        else { //right constraints for all but the last element
+            CGFloat diff = [positionDiffs[i + 1] doubleValue];
+            // Pin the right of the next leftwards tick to the previous leftwards tick
+            NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:currentItem
+                                                                    attribute:NSLayoutAttributeLeft
+                                                                    relatedBy:NSLayoutRelationEqual
+                                                                       toItem:nextItem
+                                                                    attribute:NSLayoutAttributeRight
+                                                                   multiplier:1
+                                                                     constant:diff];
+            [self addConstraint:right];
+            [rights addObject:right];
+        }
+    }
+
+    self.allTickBottomConstraints = bottoms;
+    self.leftTickRightConstraints = lefts;
+    self.rightTickLeftConstraints = rights;
+    
+    [self layoutIfNeeded];
+}
 
 - (void)setupTicksAutolayout
 {
@@ -254,6 +382,7 @@ static CGFloat const HUMTickWidth = 2;
     [self layoutIfNeeded];
 }
 
+//Size of the tick itself.
 - (void)pinTickWidthAndHeight:(UIView *)currentTick
 {
     // Pin width of tick
@@ -620,10 +749,15 @@ static CGFloat const HUMTickWidth = 2;
 
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    // Update the width
-    [self updateLeftTickConstraintsIfNeeded];
-    [self animateAllTicksIn:YES];
-    [self popTickIfNeededFromTouch:touch];
+    if (_customTicksEnabled && _ticks && [_ticks count] > 0) {
+        // ?? - TODO: Write this part. 
+    }
+    else {
+        // Update the width
+        [self updateLeftTickConstraintsIfNeeded];
+        [self animateAllTicksIn:YES];
+        [self popTickIfNeededFromTouch:touch];
+    }
     
     return [super beginTrackingWithTouch:touch withEvent:event];
 }
@@ -796,6 +930,11 @@ static CGFloat const HUMTickWidth = 2;
 {
     CGRect trackRect = [self trackRectForBounds:self.bounds];
     return floorf(CGRectGetWidth(trackRect) / self.sectionCount);
+}
+
+- (CGFloat)trackWidth {
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
+    return floorf(CGRectGetWidth(trackRect));
 }
 
 - (NSInteger)middleTickIndex

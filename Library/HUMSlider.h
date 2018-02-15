@@ -62,6 +62,9 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 ///How long to wait between animating secondary ticks. Defaults to 0.025 seconds.
 @property (nonatomic) NSTimeInterval nextTickAnimationDelay;
 
+///Turns the custom tick feature on and off. 
+@property (nonatomic) bool customTicksEnabled;
+
 
 #pragma mark - Setters/Getters for individual sides
 
@@ -70,7 +73,12 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *
  *  @param tick. The tick with the set position between 0 and 1
  */
-- (void)addTick:(Tick*)tick;
+- (void)addTick:(Tick*)tick  willRefreshView:(bool)refreshView;
+
+/**
+ *  Refreshes the view in a custom way, in case you didn't do it for each tick addition.
+ */
+- (void)refreshView;
 
 /**
  *  Removes the tick at the given index. .
