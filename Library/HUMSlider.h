@@ -13,6 +13,11 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
     HUMSliderSideRight
 };
 
+@interface Tick : NSObject
+- (id)initWithPosition:(double)position;
+@property double position; //Number between 0 and 1 indicating the slider position of the tick.
+@end
+
 /**
  * A slider which pops up ticks and saturates/desaturates images when the user adjusts
  * a slider for better feedback to the user about their adjustment.
@@ -23,6 +28,8 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 @interface HUMSlider : UISlider
 
 #pragma mark - Ticks
+///Tick positions, specified as "Tick" objects with values between 0 and 1
+@property (atomic) NSMutableArray *ticks;
 
 ///The color of the ticks you wish to pop up. Defaults to dark gray.
 @property (nonatomic) UIColor *tickColor;
@@ -32,6 +39,9 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 
 ///How many points the tick popping should be adjusted for a custom thumbnail image to account for any space at the top (for example, to balance out a custom shadow).
 @property (nonatomic) CGFloat pointAdjustmentForCustomThumb;
+
+//Fade the ticks out to transparent when the user is not actively moving the slider.
+@property (nonatomic) BOOL enableTicksTransparencyOnIdle;
 
 #pragma mark - Images
 
@@ -55,8 +65,30 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 ///How long to wait between animating secondary ticks. Defaults to 0.025 seconds.
 @property (nonatomic) NSTimeInterval nextTickAnimationDelay;
 
+///Turns the custom tick feature on and off. 
+@property (nonatomic) bool customTicksEnabled;
+
 
 #pragma mark - Setters/Getters for individual sides
+
+/**
+ *  Inserts a tick at a position.
+ *
+ *  @param tick. The tick with the set position between 0 and 1
+ */
+- (void)addTick:(Tick*)tick  willRefreshView:(bool)refreshView;
+
+/**
+ *  Refreshes the view in a custom way, in case you didn't do it for each tick addition.
+ */
+- (void)refreshView;
+
+/**
+ *  Removes the tick at the given index. .
+ *
+ *  @param tick. The tick with the set position between 0 and 1
+ */
+- (void)removeTickAtIndex:(uint)index;
 
 /**
  *  Sets the color to use as the fully-saturated color on selected side.
@@ -75,7 +107,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 /**
  *  Sets the color to use as the desaturated color on selected side.
  *
- *  @param saturatedColor The UIColor to use
+ *  @param desaturatedColor The UIColor to use
  *  @param side The side you wish to set a desaturated color upon.
  */
 - (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side;
