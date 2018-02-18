@@ -40,6 +40,9 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 ///How many points the tick popping should be adjusted for a custom thumbnail image to account for any space at the top (for example, to balance out a custom shadow).
 @property (nonatomic) CGFloat pointAdjustmentForCustomThumb;
 
+//Fade the ticks out to transparent when the user is not actively moving the slider.
+@property (nonatomic) BOOL enableTicksTransparencyOnIdle;
+
 #pragma mark - Images
 
 ///The color to use as the fully-saturated color on both sides. Defaults to red.
