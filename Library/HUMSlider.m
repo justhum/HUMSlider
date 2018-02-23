@@ -268,9 +268,6 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
         
         Tick *theTickGuy = _ticks[i];
 
-        // NSLog(@"FrameOriginX: %f, FrameWidth: %f", self.frame.origin.x, self.frame.size.width);
-        // NSLog(@"BoundsOriginX: %f, BoundsWidth: %f", self.bounds.origin.x, self.bounds.size.width);
-        
         double constant = [self tickPixelOffsetFromMiddle:theTickGuy];
 
         // Pin the middle tick to the middle of the slider.
