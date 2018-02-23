@@ -52,9 +52,9 @@ A quick programmatic example of the most common use case:
 
 ```objectivec
 
-    //Init custom ticks with one tick, at 1/3 position up the slider
+    //Init custom ticks with one tick, at 1/3 position up the slider. If adding many, refresh view on final addition.
     Tick *oneThird = [[Tick alloc] initWithPosition: 0.333];
-    [slider addTick:oneThird willRefreshView:false];
+    [slider addTick:oneThird willRefreshView:true];
     slider.customTicksEnabled = true;
 
     //Tick Removal
