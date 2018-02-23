@@ -44,8 +44,7 @@ static CGFloat const HUMTickWidth = 1;
 @property (nonatomic) NSArray *rightTickLeftConstraints; //Confusing name.. what is a right tick? Right of middle?
 
 //Constraint storage for dynamically spaced tick constraints.
-@property (nonatomic) NSArray *tickLeftConstraints;
-@property (nonatomic) NSArray *tickRightConstraints;
+@property (nonatomic) NSArray *middleTickConstraints;
 
 @property (nonatomic) UIImage *leftTemplate;
 @property (nonatomic) UIImage *rightTemplate;
@@ -62,16 +61,19 @@ static CGFloat const HUMTickWidth = 1;
 @end
 
 @implementation HUMSlider {
-    NSMutableArray *positionDiffs; //For custom tick views - diff between each tick in slider px.
-    NSMutableArray *fromLeftPositionDiffs; //Distance from left in px for each custom tick.
-    
-    double thumbImageWidth;
+#warning - clean this up
+//    NSMutableArray *positionDiffs; //For custom tick views - diff between each tick in slider px.
+//    NSMutableArray *fromLeftPositionDiffs; //Distance from left in px for each custom tick.
+//
+    CGFloat thumbImageWidth; // Reference to last computed thumb width.
+    CGRect trackRect; // store the track width from the layoutSubviews.
 }
 
 #pragma mark - Init
 
 - (void)commonInit
 {
+    trackRect = CGRectZero;
     [self thumbImageWidth]; // Lazy init of initial calc of thumb image width.
     
     self.customTicksEnabled = true; //default to true
@@ -130,7 +132,9 @@ static CGFloat const HUMTickWidth = 1;
 
 #warning - Create method to add all ticks.
 
-- (void)addTick:(Tick*)tick willRefreshView:(bool)refreshView {
+- (void)addTick:(Tick*)tick willRefreshView:(BOOL)refreshView {
+#warning - When doing the constraint from center x, the ticks do not need to be in order anymore
+    
     if ([self.ticks count] == 0) {
         [self.ticks addObject:tick];
     }
@@ -176,7 +180,7 @@ static CGFloat const HUMTickWidth = 1;
     if ([self areCustomTicksSetupAndNonNull]) {
         [self cleanupConstraintsAfterEvenlySpacedTicks];
         [self setupCustomTickViews];
-        [self setupTicksAutoLayoutCustomWidths2];
+        [self setupTicksAutoLayoutCustomWidths];
         if (!_enableTicksTransparencyOnIdle) {
             [self animateAllTicksInCustomWidths:YES];
         }
@@ -200,15 +204,16 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)cleanupConstraintsAfterCustomSpacedTicks {
     self.tickViews = [NSArray new]; // Make sure these get re-initialized
-    [self clearLayoutConstraintList:_tickLeftConstraints];
-    [self clearLayoutConstraintList:_tickRightConstraints];
-    [self clearLayoutConstraintList:_allTickBottomConstraints];
+    [self clearLayoutConstraintList:self.middleTickConstraints];
+    [self clearLayoutConstraintList:self.allTickBottomConstraints];
 }
 
 // Disassociate all of the NSLayoutConstraints in the list from the parent view.
 - (void)clearLayoutConstraintList:(NSArray*)list {
-    for (NSLayoutConstraint *constraint in list) {
-        [self removeConstraint:constraint];
+    if (list) {
+        for (NSLayoutConstraint *constraint in list) {
+            [self removeConstraint:constraint];
+        }
     }
 }
 
@@ -217,12 +222,11 @@ static CGFloat const HUMTickWidth = 1;
 }
 
 - (void)setupCustomTickViews {
-    NSLog(@"Setting up Custom tick views for %d custom ticks.", (int)[_ticks count]);
-    [self createAndAddBlankTickViewsWithCount:(int)[_ticks count]];
+    [self createAndAddBlankTickViewsWithCount:(int)[self.ticks count]];
 }
 
-- (bool)areCustomTicksSetupAndNonNull {
-    return (_customTicksEnabled && _ticks && [_ticks count] > 0);
+- (BOOL)areCustomTicksSetupAndNonNull {
+    return (self.customTicksEnabled && self.ticks && [self.ticks count] > 0);
 }
 
 - (void)createAndAddBlankTickViewsWithCount:(int)count {
@@ -245,245 +249,48 @@ static CGFloat const HUMTickWidth = 1;
     return tick;
 }
 
-// Calculate the distance differences between each tick according to the pixel width of the slider.
-// Populate the diffs between the ticks for the contraint value. Starting at 0 and ending at 1. Array size will be N+1 where N=number of ticks. There is one extra on the outside.
-- (void)calculateTickDifferences {
-    positionDiffs = [NSMutableArray new]; // All tick positions (in pixels) relative to the next tick on either side. 
-    fromLeftPositionDiffs = [NSMutableArray new]; // All tick positions (in horizontal pixels) from the far left of the slider view.
-    
-//    double thumbSliderWidth = [self thumbImageWidth];
-//    double trackWidth = [self thumbImageWidth];
-//    double trackXOrigin = [self trackXOrigin];
-    
-    // - [self thumbImageWidth]
-    //double sliderBasedCenterTrackWidth = [self trackWidth]; // Subtract the slider Diameter, the center of it is the actual start.
-    
-    //CGRect trackRect = [slider trackRectForBounds:slider.bounds];
-    
-    double trackWidth = [self trackWidth]; // self.bounds.size.width //TODO: Track Width Bug (see bottom method.)
-    //double trackWidth2 = self.bounds.size.width;
-    double sliderThumbDiameter = [self thumbImageWidth];
-    
-    double sliderBasedCenterTrackWidth = trackWidth - (sliderThumbDiameter); // times two because it isn't from origin?
-    
-    //TODO: Try this.
-    //double sliderBasedCenterTrackWidth = self.bounds.size.width - (tickCount * HUMTickWidth); // times two because it isn't from origin?
-    
-    //double zeroToOnePercentangeWidthWithoutThumbImage = sliderBasedCenterTrackWidth / self.bounds.size.width;
-    
-    //double zeroToOnePercentangeWidthWithoutThumbImage = (sliderBasedCenterTrackWidth / [self trackWidth]) ;
-    
-    //double zeroToOnePercentangeWidthWithoutThumbImage = (sliderBasedCenterTrackWidth / trackWidth) ;
-    
-    //double fromCenter = zeroToOnePercentangeWidthWithoutThumbImage - 0.5;
-    
-    int tickCount = (int)[_ticks count]; //Have Tick views been updated?
-    
-    double fromLeftRollingAppender = 0; //TODO: Start at OriginX?
-    for (NSInteger i = 0; i <= tickCount; i++) {
-        double currentItem = i == tickCount ? 1 : ((Tick*)self.ticks[i]).position; // zero to one percentage.
-        double previousItem = i == 0 ? 0 : ((Tick*)self.ticks[i - 1]).position; // zero to one percentage
-
-        double currItemMultValue = currentItem - 0.5;
-        double prevItemMultValue = previousItem - 0.5;
-        
-        double zeroToOnePercentage = currentItem - previousItem;
-        //double zeroToOnePercentage2 = (currItemMultValue - prevItemMultValue); // * zeroToOnePercentangeWidthWithoutThumbImage;
-        //double distanceDiff = (zeroToOnePercentage * sliderBasedCenterTrackWidth) - HUMTickWidth; // - HUMTickWidth
-        double distanceDiff = (zeroToOnePercentage * trackWidth); // - HUMTickWidth
-        //double distanceDiff = (zeroToOnePercentage2 * [self trackWidth]) - HUMTickWidth;
-        
-        
-//        double distanceDiff2 = ((currItemMultValue * sliderBasedCenterTrackWidth) - (prevItemMultValue * sliderBasedCenterTrackWidth) - HUMTickWidth);
-//        //double distanceDiff2 = ((currentItem * sliderBasedCenterTrackWidth) - (previousTime * sliderBasedCenterTrackWidth)) - HUMTickWidth;
-//        if (floor(distanceDiff) != floor(distanceDiff2)) {
-//            bool shit = true;
-//        }
-//        else {
-//            bool justFine = true;
-//            //distanceDiff -= HUMTickWidth;
-//        }
-        //if (i == 0) {
-            //distanceDiff += [self trackXOrigin] + (HUMTickWidth / 2.0); //Half of thumb image width.
-            //distanceDiff += (sliderThumbDiameter / 2) - (HUMTickWidth / 2.0); // - [self trackXOrigin]; //[self trackXOrigin] +
-        //}
-        //else if (i == tickCount) {
-            //distanceDiff += (sliderThumbDiameter / 2) - (HUMTickWidth / 2.0); // - [self trackXOrigin];
-        //}
-        
-        //Far left and far right tick constraints need to be adjusted in towards the center of the slider by half of the thumb image radius.
-        if (i == 0 || i == tickCount) {
-            //distanceDiff += [self thumbImageWidth] / 4;// - HUMTickWidth;
-            //distanceDiff += HUMTickWidth;
-            //distanceDiff += [self trackXOrigin];
-        }
-        //distanceDiff = floor(distanceDiff) - HUMTickWidth; //TODO: OriginX?
-        [positionDiffs insertObject:[NSNumber numberWithDouble: distanceDiff] atIndex:(i)];
-        fromLeftRollingAppender += distanceDiff;
-        [fromLeftPositionDiffs insertObject:[NSNumber numberWithDouble: fromLeftRollingAppender] atIndex:(i)];
-    }
-    NSLog(@"Calculated %d position differentials", (int)[positionDiffs count]);
-}
-
 #pragma mark Autolayout
 
 - (void)setupTicksAutoLayoutCustomWidths {
     
     assert([self areCustomTicksSetupAndNonNull]);
     
-    //Store the left, right and bottom constraints for some reason
+    //Store the position and bottom constraints for some reason
     NSMutableArray *bottoms = [NSMutableArray array];
-    NSMutableArray *lefts = [NSMutableArray array];
-    NSMutableArray *rights = [NSMutableArray array];
-    
-    int tickCount = (int)[self.tickViews count];
-    
-    //Populate the diffs between the ticks for the contraint value. Starting at 0 and ending at 1. Array size will be N+1 where N=number of ticks. There is one extra on the outside.
-    [self calculateTickDifferences];
-    
-    //This is the new code to start at the first one.
+    NSMutableArray *middleConstraints = [NSMutableArray array];
+
     for (NSInteger i = 0; i < [self.tickViews count]; i++) {
-        bool isFirst = i == 0 ? true : false;
-        bool isLast = i == tickCount - 1 ? true : false;
         
         UIView *currentItem = self.tickViews[i];
-        UIView *previousItem = isFirst ? NULL : self.tickViews[i - 1];
-        UIView *nextItem = isLast ? NULL : self.tickViews[i + 1];
-        
+
         NSLayoutConstraint *bottomConstraint = [self pinTickBottom:currentItem];
         [self addConstraint:bottomConstraint];
         [bottoms insertObject:bottomConstraint atIndex:i];
         [self pinTickWidthAndHeight:currentItem];
         
-        if (isFirst) {
-            CGFloat diff = [positionDiffs[i] doubleValue];
-            // Pin the first tick to the left of the view.
-            NSLayoutConstraint *farLeft = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                    attribute:NSLayoutAttributeLeft
-                                                                    relatedBy:NSLayoutRelationEqual
-                                                                       toItem:self
-                                                                    attribute:NSLayoutAttributeLeft
-                                                                   multiplier:1
-                                                                     constant:diff];
-            [farLeft setPriority:UILayoutPriorityDefaultHigh];
-            [self addConstraint:farLeft];
-            [lefts addObject:farLeft];
-        }
-        else { //Left constraints for all but the first element.
-            CGFloat diff = [positionDiffs[i] doubleValue];
-            // Pin the right of the next leftwards tick to the previous leftwards tick
-            NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                    attribute:NSLayoutAttributeRight
-                                                                    relatedBy:NSLayoutRelationEqual
-                                                                       toItem:previousItem
-                                                                    attribute:NSLayoutAttributeLeft
-                                                                   multiplier:1
-                                                                     constant:diff];
-            [self addConstraint:left];
-            [lefts addObject:left];
-        }
+        Tick *theTickGuy = _ticks[i];
+
+        // NSLog(@"FrameOriginX: %f, FrameWidth: %f", self.frame.origin.x, self.frame.size.width);
+        // NSLog(@"BoundsOriginX: %f, BoundsWidth: %f", self.bounds.origin.x, self.bounds.size.width);
         
-        if (isLast) {
-            CGFloat diff = [positionDiffs[i + 1] doubleValue];
-            // Pin the first tick to the left of the view.
-            NSLayoutConstraint *farRight = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                       attribute:NSLayoutAttributeRight
-                                                                       relatedBy:NSLayoutRelationEqual
-                                                                          toItem:self
-                                                                       attribute:NSLayoutAttributeRight
-                                                                      multiplier:1
-                                                                        constant:diff];
-            [farRight setPriority:UILayoutPriorityDefaultHigh];
-            [self addConstraint:farRight];
-            [rights addObject:farRight];
-        }
-        else { //right constraints for all but the last element
-            CGFloat diff = [positionDiffs[i + 1] doubleValue];
-            // Pin the right of the next leftwards tick to the previous leftwards tick
-            NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                    attribute:NSLayoutAttributeLeft
-                                                                    relatedBy:NSLayoutRelationEqual
-                                                                       toItem:nextItem
-                                                                    attribute:NSLayoutAttributeRight
-                                                                   multiplier:1
-                                                                     constant:diff];
-            [self addConstraint:right];
-            [rights addObject:right];
-        }
+        double constant = [self tickPixelOffsetFromMiddle:theTickGuy];
+
+        // Pin the middle tick to the middle of the slider.
+        NSLayoutConstraint *middle = [NSLayoutConstraint constraintWithItem:currentItem
+                                                         attribute:NSLayoutAttributeCenterX
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self
+                                                         attribute:NSLayoutAttributeCenterX
+                                                        multiplier:1
+                                                          constant:constant];
+        
+        [self addConstraint:middle];
+        [middleConstraints addObject:middle];
     }
-    
-    NSLog(@"Created %d custom lefts, %d custom rights, and %d custom bottoms", (int)[lefts count], (int)[rights count], (int)[bottoms count]);
 
     self.allTickBottomConstraints = bottoms;
-    
-    self.tickLeftConstraints = lefts;
-    self.tickRightConstraints = rights;
-    
-    [self layoutIfNeeded];
-}
+    self.middleTickConstraints = middleConstraints;
 
-- (void)setupTicksAutoLayoutCustomWidths2 {
-    
-    assert([self areCustomTicksSetupAndNonNull]);
-    
-    //Store the left, right and bottom constraints for some reason
-    NSMutableArray *bottoms = [NSMutableArray array];
-    NSMutableArray *lefts = [NSMutableArray array];
-    NSMutableArray *rights = [NSMutableArray array];
-    
-    int tickCount = (int)[self.tickViews count];
-    
-    //Populate the diffs between the ticks for the contraint value. Starting at 0 and ending at 1. Array size will be N+1 where N=number of ticks. There is one extra on the outside.
-    [self calculateTickDifferences];
-    
-    //This is the new code to start at the first one.
-    for (NSInteger i = 0; i < [self.tickViews count]; i++) {
-        bool isFirst = i == 0 ? true : false;
-        bool isLast = i == tickCount - 1 ? true : false;
-        
-        UIView *currentItem = self.tickViews[i];
-        UIView *previousItem = isFirst ? NULL : self.tickViews[i - 1];
-        UIView *nextItem = isLast ? NULL : self.tickViews[i + 1];
-        
-        NSLayoutConstraint *bottomConstraint = [self pinTickBottom:currentItem];
-        [self addConstraint:bottomConstraint];
-        [bottoms insertObject:bottomConstraint atIndex:i];
-        [self pinTickWidthAndHeight:currentItem];
-        
-        CGFloat diff = [fromLeftPositionDiffs[i] doubleValue];
-        // Pin the first tick to the left of the view.
-        NSLayoutConstraint *farLeft = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                   attribute:NSLayoutAttributeLeft
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:self
-                                                                   attribute:NSLayoutAttributeLeft
-                                                                  multiplier:1
-                                                                    constant:diff];
-        [farLeft setPriority:UILayoutPriorityDefaultHigh];
-        [self addConstraint:farLeft];
-        [lefts addObject:farLeft];
-
-        diff = [self  trackWidth] - diff;
-        // Pin the first tick to the left of the view.
-        NSLayoutConstraint *farRight = [NSLayoutConstraint constraintWithItem:currentItem
-                                                                    attribute:NSLayoutAttributeRight
-                                                                    relatedBy:NSLayoutRelationEqual
-                                                                       toItem:self
-                                                                    attribute:NSLayoutAttributeRight
-                                                                   multiplier:1
-                                                                     constant:diff];
-        [farRight setPriority:UILayoutPriorityDefaultHigh];
-        [self addConstraint:farRight];
-        [rights addObject:farRight];
-    }
-    
-    NSLog(@"Created %d custom lefts, %d custom rights, and %d custom bottoms", (int)[lefts count], (int)[rights count], (int)[bottoms count]);
-    
-    self.allTickBottomConstraints = bottoms;
-    
-    self.tickLeftConstraints = lefts;
-    self.tickRightConstraints = rights;
-    
     [self layoutIfNeeded];
 }
 
@@ -757,9 +564,11 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)layoutSubviews
 {
+    trackRect = [self trackRectForBounds:self.bounds];
+    
     [super layoutSubviews];
     if ([self areCustomTicksSetupAndNonNull]) {
-        [self updateCustomTickConstraintsIfNeeded2];
+        [self updateCustomTickConstraintsIfNeeded];
     }
     else {
         [self updateLeftTickConstraintsIfNeeded];
@@ -791,62 +600,24 @@ static CGFloat const HUMTickWidth = 1;
     assert([self areCustomTicksSetupAndNonNull]);
     
     int tickCount = (int)[self.tickViews count];
-
-    // Calculate position differences if necessary.
-    // TODO Cleanup
-    if (!positionDiffs || [positionDiffs count] != tickCount + 1) {
-        [self calculateTickDifferences];
-    }
-
-    NSLayoutConstraint *firstLeft = self.tickLeftConstraints.firstObject; // special case - pin left of view to left-most tick.
-    NSLayoutConstraint *lastRight = self.tickRightConstraints.lastObject; // special case - pin right of view to right-most tick.
     
-    //if (firstLeft.constant != ((NSNumber*)positionDiffs.firstObject).doubleValue) {
-        firstLeft.constant = ((NSNumber*)positionDiffs.firstObject).doubleValue;
-        lastRight.constant = ((NSNumber*)positionDiffs.lastObject).doubleValue;
-        
+    NSLayoutConstraint *firstLeft = self.middleTickConstraints.firstObject;
+    
+    Tick *firstTick = self.ticks[0];
+    
+    CGFloat constant = [self tickPixelOffsetFromMiddle:firstTick];
+    
+    if (firstLeft.constant != constant) {
+
         //This is the new code to start at the first one.
-        for (NSInteger i = 1; i < tickCount; i++) {
-            NSLayoutConstraint *leftConstraint = _tickLeftConstraints[i];
-            NSLayoutConstraint *rightConstraint = _tickRightConstraints[i];
-            leftConstraint.constant = ((NSNumber*)positionDiffs[i]).doubleValue;
-            rightConstraint.constant = ((NSNumber*)positionDiffs[i+1]).doubleValue; // we have one more position diff than ticks.
+        for (NSInteger i = 0; i < tickCount; i++) {
+            NSLayoutConstraint *middleConstraint = self.middleTickConstraints[i];
+            Tick *theTick = self.ticks[i];
+            middleConstraint.constant = [self tickPixelOffsetFromMiddle:theTick];
         }
-        
+    
         [self layoutIfNeeded];
-    //}
-}
-
-- (void)updateCustomTickConstraintsIfNeeded2
-{
-    assert([self areCustomTicksSetupAndNonNull]);
-    
-    int tickCount = (int)[self.tickViews count];
-    
-    // Calculate position differences if necessary.
-    // TODO Cleanup
-    if (!positionDiffs || [positionDiffs count] != tickCount + 1) {
-        [self calculateTickDifferences];
     }
-    
-    NSLayoutConstraint *firstLeft = self.tickLeftConstraints.firstObject; // special case - pin left of view to left-most tick.
-    NSLayoutConstraint *lastRight = self.tickRightConstraints.lastObject; // special case - pin right of view to right-most tick.
-    
-    //if (firstLeft.constant != ((NSNumber*)positionDiffs.firstObject).doubleValue) {
-    firstLeft.constant = ((NSNumber*)positionDiffs.firstObject).doubleValue;
-    lastRight.constant = ((NSNumber*)positionDiffs.lastObject).doubleValue;
-    
-    //This is the new code to start at the first one.
-    for (NSInteger i = 1; i < tickCount; i++) {
-        NSLayoutConstraint *leftConstraint = _tickLeftConstraints[i];
-        NSLayoutConstraint *rightConstraint = _tickRightConstraints[i];
-        double fromLeft = ((NSNumber*)fromLeftPositionDiffs[i]).doubleValue;
-        leftConstraint.constant = fromLeft;
-        rightConstraint.constant = [self trackWidth] - fromLeft; // we have one more position diff than ticks.
-    }
-    
-    [self layoutIfNeeded];
-    //}
 }
 
 #pragma mark - Overridden Setters
@@ -970,9 +741,6 @@ static CGFloat const HUMTickWidth = 1;
 
 - (UIImageView *)imageViewForSide:(HUMSliderSide)side saturated:(BOOL)saturated
 {
-    //TODO: Figure out what this is used for and update it.
-#pragma mark - warning, see the thing above.
-    
     switch (side) {
         case HUMSliderSideLeft:
             if (saturated) {
@@ -1007,52 +775,75 @@ static CGFloat const HUMTickWidth = 1;
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
     if ([self areCustomTicksSetupAndNonNull]) {
-
         [self updateCustomTickConstraintsIfNeeded];
         [self animateAllTicksInCustomWidths:YES];
-        [self popTickIfNeededFromTouch:touch];
     }
     else {
-        // Update the width
         [self updateLeftTickConstraintsIfNeeded];
         [self animateAllTicksIn:YES];
-        [self popTickIfNeededFromTouch:touch];
     }
+    
+    [self popTickIfNeededFromTouch:touch];
     
     return [super beginTrackingWithTouch:touch withEvent:event];
 }
 
-// TODO: Hook this up
+- (void)updateTickHeights {
+     #warning - fix this method.
+    //TODO: Reuse this fromn the pop method.
+
+            CGRect trackRect = [self trackRectForBounds:self.bounds];
+            CGRect thumbRect = [self thumbRectForBounds:self.bounds
+                                              trackRect:trackRect
+                                                  value:self.value];
+            
+        #warning - there may be an issue calculating the slider location.
+            CGFloat sliderLoc = CGRectGetMidX(thumbRect);
+            
+            // Animate tick based on the thumb location
+            for (NSInteger i = 0; i < self.tickViews.count; i++) {
+                if ([self areCustomTicksSetupAndNonNull]) {
+                    [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
+                }
+                else {
+                    [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
+                }
+            }
+    
+}
+
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
+#warning - fix this method.
+    
     assert ([self areCustomTicksSetupAndNonNull]);
     
-    UIView *tick = self.tickViews[tickIndex];
+    //UIView *tick = self.tickViews[tickIndex];
     
-    NSLog(@" Track X Origin: %f", self.trackXOrigin);
+    //NSLog(@" Track X Origin: %f", self.trackXOrigin);
     
-    double distanceFromLeft = ((NSNumber*)fromLeftPositionDiffs[tickIndex]).doubleValue;
+    //double distanceFromLeft = ((NSNumber*)fromLeftPositionDiffs[tickIndex]).doubleValue;
     
-    double thumbSliderRadius = [self thumbImageWidth] / 2;
+    //double thumbSliderRadius = [self thumbImageWidth] / 2;
     
-    CGFloat startSegmentX = distanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
-    CGFloat endSegmentX = distanceFromLeft + thumbSliderRadius;
+    //CGFloat startSegmentX = distanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
+    //CGFloat endSegmentX = distanceFromLeft + thumbSliderRadius;
     
-    CGFloat desiredOrigin;
-    if (startSegmentX <= touchX && endSegmentX > touchX) {
-        // Pop up.
-        desiredOrigin = [self tickPoppedPosition];
-    } else {
-        // Bring down.
-        desiredOrigin = [self tickInNotPoppedPositon];
-    }
-    
-    if (CGRectGetMinY(tick.frame) != desiredOrigin) {
-        [self animateTickAtIndex:tickIndex
-                       toYOrigin:desiredOrigin
-                    withDuration:self.tickMovementAnimationDuration
-                           delay:0];
-    } // else tick is already where it needs to be.
+//    CGFloat desiredOrigin;
+//    if (startSegmentX <= touchX && endSegmentX > touchX) {
+//        // Pop up.
+//        desiredOrigin = [self tickPoppedPosition];
+//    } else {
+//        // Bring down.
+//        desiredOrigin = [self tickInNotPoppedPositon];
+//    }
+//
+//    if (CGRectGetMinY(tick.frame) != desiredOrigin) {
+//        [self animateTickAtIndex:tickIndex
+//                       toYOrigin:desiredOrigin
+//                    withDuration:self.tickMovementAnimationDuration
+//                           delay:0];
+    //} // else tick is already where it needs to be.
 }
 
 - (void)animateTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
@@ -1089,21 +880,17 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)popTickIfNeededFromTouch:(UITouch *)touch
 {
-#pragma mark - Warning - update this method for custom tick widths.
-    //TODO: This method needs to be updated for the custom tick widths.
-    
-    // Figure out where the hell the thumb is.
     CGRect trackRect = [self trackRectForBounds:self.bounds];
     CGRect thumbRect = [self thumbRectForBounds:self.bounds
                                       trackRect:trackRect
                                           value:self.value];
     
-#warning - there may be an issue calculating the slider location.
     CGFloat sliderLoc = CGRectGetMidX(thumbRect);
     
     // Animate tick based on the thumb location
     for (NSInteger i = 0; i < self.tickViews.count; i++) {
         if ([self areCustomTicksSetupAndNonNull]) {
+            #warning - this isn't working currently, fix it up
             [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
         }
         else {
@@ -1271,17 +1058,10 @@ static CGFloat const HUMTickWidth = 1;
     return CGRectGetMinY(trackRect);
 }
 
-#warning - replace this with something more dynamic.
 - (CGFloat)segmentWidth
 {
     CGRect trackRect = [self trackRectForBounds:self.bounds];
     return floorf(CGRectGetWidth(trackRect) / self.sectionCount);
-}
-
-- (CGFloat)trackWidth {
-    CGRect trackRect = [self trackRectForBounds:self.bounds];
-    return CGRectGetWidth(trackRect);
-    //return floorf(CGRectGetWidth(trackRect));
 }
 
 - (NSInteger)middleTickIndex
@@ -1318,6 +1098,12 @@ static CGFloat const HUMTickWidth = 1;
 - (CGFloat)tickPoppedPosition
 {
     return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential] + self.pointAdjustmentForCustomThumb;
+}
+
+- (CGFloat)tickPixelOffsetFromMiddle:(Tick*)tick {
+    double trackWidth = trackRect.size.width - [self thumbImageWidth] + trackRect.origin.x; // :)
+    double constant = (tick.position * trackWidth) - (trackWidth / 2);
+    return constant;
 }
 
 - (double)thumbImageWidth // default thumb image is 30 px,

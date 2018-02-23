@@ -116,4 +116,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  */
 - (UIColor *)desaturatedColorForSide:(HUMSliderSide)side;
 
+// TODO: Update the tick heights.
+- (void)updateTickHeights;
+
 @end
