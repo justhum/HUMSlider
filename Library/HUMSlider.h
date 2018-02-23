@@ -14,8 +14,8 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 };
 
 @interface Tick : NSObject
-- (id)initWithPosition:(double)position;
-@property double position; //Number between 0 and 1 indicating the slider position of the tick.
+- (id)initWithPosition:(NSUInteger)position;
+@property NSUInteger position; //Number between 0 and 1 indicating the slider position of the tick.
 @end
 
 /**
