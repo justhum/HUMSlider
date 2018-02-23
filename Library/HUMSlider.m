@@ -15,12 +15,15 @@ static NSTimeInterval const HUMSecondTickDuration = 0.35;
 static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
-static CGFloat const HUMTickOutToInDifferential = 8;
+static CGFloat const HUMTickOutToInDifferential = 9;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
 static CGFloat const HUMTickHeight = 8;
 static CGFloat const HUMTickWidth = 1;
+
+// Default Constants
+static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb icon.
 
 @implementation Tick
 // Constructor for a tick
@@ -40,8 +43,8 @@ static CGFloat const HUMTickWidth = 1;
 @property (nonatomic) NSArray *allTickBottomConstraints;
 
 //Constraint storage for evenly spaced tick constraints.
-@property (nonatomic) NSArray *leftTickRightConstraints; //Confusing name.. what is a left tick? Left of middle?
-@property (nonatomic) NSArray *rightTickLeftConstraints; //Confusing name.. what is a right tick? Right of middle?
+@property (nonatomic) NSArray *leftTickRightConstraints; //FUTURE, use the middleTickConstraints strategy for equal spaced ticks
+@property (nonatomic) NSArray *rightTickLeftConstraints;
 
 //Constraint storage for dynamically spaced tick constraints.
 @property (nonatomic) NSArray *middleTickConstraints;
@@ -61,10 +64,6 @@ static CGFloat const HUMTickWidth = 1;
 @end
 
 @implementation HUMSlider {
-#warning - clean this up
-//    NSMutableArray *positionDiffs; //For custom tick views - diff between each tick in slider px.
-//    NSMutableArray *fromLeftPositionDiffs; //Distance from left in px for each custom tick.
-//
     CGFloat thumbImageWidth; // Reference to last computed thumb width.
     CGRect trackRect; // store the track width from the layoutSubviews.
 }
@@ -76,6 +75,7 @@ static CGFloat const HUMTickWidth = 1;
     trackRect = CGRectZero;
     [self thumbImageWidth]; // Lazy init of initial calc of thumb image width.
     
+    self.lowerTicksOnInactiveTouch = true; //default to lowering them.
     self.customTicksEnabled = true; //default to true
     self.enableTicksTransparencyOnIdle = false; // keep ticks at all times.
     
@@ -130,10 +130,7 @@ static CGFloat const HUMTickWidth = 1;
 
 #pragma mark - Ticks
 
-#warning - Create method to add all ticks.
-
 - (void)addTick:(Tick*)tick willRefreshView:(BOOL)refreshView {
-#warning - When doing the constraint from center x, the ticks do not need to be in order anymore
     
     if ([self.ticks count] == 0) {
         [self.ticks addObject:tick];
@@ -151,6 +148,7 @@ static CGFloat const HUMTickWidth = 1;
     
     if (refreshView) {
         [self setupTickViews];
+        [self updateTickHeights];
     }
 }
 
@@ -573,7 +571,6 @@ static CGFloat const HUMTickWidth = 1;
     else {
         [self updateLeftTickConstraintsIfNeeded];
     }
-    
 }
 
 // First method that is called when animating ticks in.
@@ -789,61 +786,61 @@ static CGFloat const HUMTickWidth = 1;
 }
 
 - (void)updateTickHeights {
-     #warning - fix this method.
-    //TODO: Reuse this fromn the pop method.
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateTickHeights];
+            return;
+        });
+    }
 
-            CGRect trackRect = [self trackRectForBounds:self.bounds];
-            CGRect thumbRect = [self thumbRectForBounds:self.bounds
-                                              trackRect:trackRect
-                                                  value:self.value];
-            
-        #warning - there may be an issue calculating the slider location.
-            CGFloat sliderLoc = CGRectGetMidX(thumbRect);
-            
-            // Animate tick based on the thumb location
-            for (NSInteger i = 0; i < self.tickViews.count; i++) {
-                if ([self areCustomTicksSetupAndNonNull]) {
-                    [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
-                }
-                else {
-                    [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
-                }
-            }
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
+    CGRect thumbRect = [self thumbRectForBounds:self.bounds
+                                      trackRect:trackRect
+                                          value:self.value];
+
+    CGFloat sliderLoc = CGRectGetMidX(thumbRect);
+    
+    // Animate tick based on the thumb location
+    for (NSInteger i = 0; i < self.tickViews.count; i++) {
+        if ([self areCustomTicksSetupAndNonNull]) {
+            [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
+        }
+        else {
+            [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
+        }
+    }
     
 }
 
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
-#warning - fix this method.
-    
     assert ([self areCustomTicksSetupAndNonNull]);
     
-    //UIView *tick = self.tickViews[tickIndex];
+    UIView *tick = self.tickViews[tickIndex];
+
+    NSLayoutConstraint *constraint = self.middleTickConstraints[tickIndex];
     
-    //NSLog(@" Track X Origin: %f", self.trackXOrigin);
+    CGFloat distanceFromLeft = (trackRect.size.width / 2) + (constraint.constant);
+    CGFloat thumbSliderRadius = [self thumbImageWidth] / 2;
     
-    //double distanceFromLeft = ((NSNumber*)fromLeftPositionDiffs[tickIndex]).doubleValue;
+    CGFloat startSegmentX = distanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
+    CGFloat endSegmentX = distanceFromLeft + thumbSliderRadius;
     
-    //double thumbSliderRadius = [self thumbImageWidth] / 2;
-    
-    //CGFloat startSegmentX = distanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
-    //CGFloat endSegmentX = distanceFromLeft + thumbSliderRadius;
-    
-//    CGFloat desiredOrigin;
-//    if (startSegmentX <= touchX && endSegmentX > touchX) {
-//        // Pop up.
-//        desiredOrigin = [self tickPoppedPosition];
-//    } else {
-//        // Bring down.
-//        desiredOrigin = [self tickInNotPoppedPositon];
-//    }
-//
-//    if (CGRectGetMinY(tick.frame) != desiredOrigin) {
-//        [self animateTickAtIndex:tickIndex
-//                       toYOrigin:desiredOrigin
-//                    withDuration:self.tickMovementAnimationDuration
-//                           delay:0];
-    //} // else tick is already where it needs to be.
+    CGFloat desiredOrigin;
+    if (startSegmentX <= touchX && endSegmentX > touchX) {
+        // Pop up.
+        desiredOrigin = [self tickPoppedPosition];
+    } else{
+        // Bring down.
+        desiredOrigin = [self tickInNotPoppedPositon];
+    }
+
+    if (CGRectGetMinY(tick.frame) != desiredOrigin) {
+        [self animateTickAtIndex:tickIndex
+                       toYOrigin:desiredOrigin
+                    withDuration:self.tickMovementAnimationDuration
+                           delay:0];
+    } // else tick is already where it needs to be.
 }
 
 - (void)animateTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
@@ -890,7 +887,6 @@ static CGFloat const HUMTickWidth = 1;
     // Animate tick based on the thumb location
     for (NSInteger i = 0; i < self.tickViews.count; i++) {
         if ([self areCustomTicksSetupAndNonNull]) {
-            #warning - this isn't working currently, fix it up
             [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
         }
         else {
@@ -917,14 +913,17 @@ static CGFloat const HUMTickWidth = 1;
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    [self returnPosition]; //TODO: WTF does return position do? This just calls the animage method again...
+    [self returnPosition];
     
     [super touchesEnded:touches withEvent:event];
 }
 
 - (void)returnPosition
 {
-    //TODO: This is our guy!
+    if (self.lowerTicksOnInactiveTouch == NO) {
+        return;
+    }
+
     if ([self areCustomTicksSetupAndNonNull]) {
         [self animateAllTicksInCustomWidths:NO];
     }
@@ -1027,8 +1026,6 @@ static CGFloat const HUMTickWidth = 1;
               withDuration:(NSTimeInterval)duration
                      delay:(NSTimeInterval)delay
 {
-    
-    
     NSLayoutConstraint *constraint = self.allTickBottomConstraints[index];
     constraint.constant = yOrigin;
     
@@ -1106,18 +1103,14 @@ static CGFloat const HUMTickWidth = 1;
     return constant;
 }
 
-- (double)thumbImageWidth // default thumb image is 30 px,
+- (CGFloat)thumbImageWidth // default thumb image is 30 px,
 {
-    // Won't fail to compute the thumb image width unless its width is 0;
-    if (!thumbImageWidth || thumbImageWidth == 0) {
-        
-        double thumbImageWidthFromSetImage = self.currentThumbImage.size.width;
-        if (!thumbImageWidthFromSetImage || thumbImageWidthFromSetImage == 0) {
-            thumbImageWidth = 30; //Guess and check default value for thumb image on UISlider.
-        }
-        else {
-            thumbImageWidth = thumbImageWidthFromSetImage;
-        }
+    double imgThumbImageWidth = self.currentThumbImage.size.width;
+    if (imgThumbImageWidth && imgThumbImageWidth != 0 && imgThumbImageWidth != thumbImageWidth) {
+        thumbImageWidth = imgThumbImageWidth;
+    }
+    else if (!thumbImageWidth || thumbImageWidth == 0) { // No custom image set, use 30
+        thumbImageWidth = DefaultThumbPxWidth;
     }
     return thumbImageWidth;
 }

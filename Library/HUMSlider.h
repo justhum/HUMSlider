@@ -66,7 +66,10 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 @property (nonatomic) NSTimeInterval nextTickAnimationDelay;
 
 ///Turns the custom tick feature on and off. 
-@property (nonatomic) bool customTicksEnabled;
+@property (nonatomic) BOOL customTicksEnabled;
+
+///Ticks animate down to track line when user is not actively moving the slider.
+@property (nonatomic) BOOL lowerTicksOnInactiveTouch;
 
 
 #pragma mark - Setters/Getters for individual sides
@@ -116,7 +119,12 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  */
 - (UIColor *)desaturatedColorForSide:(HUMSliderSide)side;
 
-// TODO: Update the tick heights.
+/**
+ * Method to manually update the tick heights to the thumb image as
+ *  if the touch was tracking. This comes in handy if the slider will
+ *  move separate from user input, like for song playback or other non-
+ *  user driven input.
+ */
 - (void)updateTickHeights;
 
 @end
