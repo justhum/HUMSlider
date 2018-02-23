@@ -809,7 +809,6 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
             [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
         }
     }
-    
 }
 
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX

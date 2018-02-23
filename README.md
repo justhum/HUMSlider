@@ -32,12 +32,44 @@ A quick programmatic example of the most common use case:
     // What color should the image be when the thumb is not close to it?
     slider.desaturatedColor = [[UIColor redColor] colorWithAlpha:0.5f]; 
     
-    // How many ticks do you want?
+    // How many ticks do you want?  (Only works if customTicksEnabled == false)
     slider.sectionCount = 11; // This should be an odd number.
     
     // What color should the ticks be?
     slider.tickColor = [UIColor blackColor];    
+
+    //Turns the custom tick feature on and off, defaults to NO
+    slider.customTicksEnabled = YES;
+
+    //Ticks animate down to track line when user is not actively moving the slider. Defaults to YES
+    slider.lowerTicksOnInactiveTouch = NO; 
+
+    //Ticks will fade out when the user is not actively moving the touch slider. Defaults to YES
+    slider.enableTicksTransparencyOnIdle = NO; 
 ```
+
+###Custom Ticks
+
+```objectivec
+
+    //Init custom ticks with one tick, at 1/3 position up the slider
+    Tick *oneThird = [[Tick alloc] initWithPosition: 0.333];
+    [slider addTick:oneThird willRefreshView:false];
+    slider.customTicksEnabled = true;
+
+    //Tick Removal
+    [slider removeTickAtIndex:0];
+```
+
+###Custom Tracking
+
+- Simply call the updateTickHeights method regularly if you are programmatically
+  moving the slider, and want the ticks the same as if the user is moving them.
+
+```objectivec
+   [slider updateTickHeights]
+```
+
 
 Full code is available in the sample app included in this repo. 
 
@@ -56,3 +88,4 @@ Full code is available in the sample app included in this repo.
 
 - Design: [Aaron Shekey](http://github.com/aaronshekey)
 - Engineering: [Ellen Shapiro](http://github.com/designatednerd)
+- Custom Ticks Feature: [Jeffrey Blayney](https://github.com/thejeff77)
