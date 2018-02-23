@@ -5,7 +5,7 @@ A slider control with auto-appearing ticks and saturating images at each end. St
 
 ![](slider_in_action.gif)
 
-##Setup
+## Setup
 
 To use this control, we strongly recommend using [CocoaPods](http://cocoapods.org). To do so add the following to your `Podfile`:  
 
@@ -15,7 +15,7 @@ pod 'HUMSlider', ~>'1.0'
 
 and then `pod install`. 
 
-##Usage
+## Usage
 
 A quick programmatic example of the most common use case: 
 
@@ -48,7 +48,7 @@ A quick programmatic example of the most common use case:
     slider.enableTicksTransparencyOnIdle = NO; 
 ```
 
-###Custom Ticks
+## Custom Ticks
 
 ```objectivec
 
@@ -61,7 +61,7 @@ A quick programmatic example of the most common use case:
     [slider removeTickAtIndex:0];
 ```
 
-###Custom Tracking
+## Custom Tracking
 
 - Simply call the updateTickHeights method regularly if you are programmatically
   moving the slider, and want the ticks the same as if the user is moving them.
@@ -73,7 +73,7 @@ A quick programmatic example of the most common use case:
 
 Full code is available in the sample app included in this repo. 
 
-##Usage notes
+## Usage notes
 
 - The number of ticks **must be odd** - otherwise pretty much all the math for centering things breaks spectacularly. Attempting to add an even number of ticks will cause an assertion failure during development.
 - If you are using a custom thumb image which has some clear space at the top, use the `pointAdjustmentForCustomThumb` property to compensate for this. 
@@ -84,7 +84,7 @@ Full code is available in the sample app included in this repo.
 - If you set the `saturatedColor` or `desaturatedColor` properties, it will set the same color on both sides. Use the `setSaturatedColor:forSide:` and `setDesaturatedColor:forSide` to set separate colors per side. 
 
 
-#Contributors
+## Contributors
 
 - Design: [Aaron Shekey](http://github.com/aaronshekey)
 - Engineering: [Ellen Shapiro](http://github.com/designatednerd)
