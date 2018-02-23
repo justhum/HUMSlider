@@ -76,8 +76,8 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
     [self thumbImageWidth]; // Lazy init of initial calc of thumb image width.
     
     self.lowerTicksOnInactiveTouch = true; //default to lowering them.
-    self.customTicksEnabled = true; //default to true
-    self.enableTicksTransparencyOnIdle = false; // keep ticks at all times.
+    self.customTicksEnabled = false; //default to true
+    self.enableTicksTransparencyOnIdle = true; // keep ticks at all times.
     
     // Set default values.
     self.sectionCount = 9;
