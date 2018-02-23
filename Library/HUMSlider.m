@@ -27,7 +27,7 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 
 @implementation Tick
 // Constructor for a tick
-- (id)initWithPosition:(double)position {
+- (id)initWithPosition:(CGFloat)position {
     NSAssert(position >= 0 && position <= 1, @"Position must be between 0 and 1");
     self = [super init];
     if (self) {
@@ -136,9 +136,9 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
         [self.ticks addObject:tick];
     }
     else { // Sorted-ly add the tick in the right sorted order.
-        unsigned long index = [self.ticks count];
-        for (Tick *tick_itr in [self.ticks reverseObjectEnumerator]) {
-            if (tick.position >= tick_itr.position) {
+        NSUInteger index = [self.ticks count];
+        for (Tick *tickItr in [self.ticks reverseObjectEnumerator]) {
+            if (tick.position >= tickItr.position) {
                 [self.ticks insertObject:tick atIndex:index];
                 break;
             }
@@ -152,7 +152,7 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
     }
 }
 
-- (void)removeTickAtIndex:(uint)index {
+- (void)removeTickAtIndex:(NSUInteger)index {
     [_ticks removeObjectAtIndex:index];
 }
 
@@ -216,18 +216,18 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 }
 
 - (void)setupSpacedTickViews {
-    [self createAndAddBlankTickViewsWithCount:(int)self.sectionCount];
+    [self createAndAddBlankTickViewsWithCount:(NSUInteger)self.sectionCount];
 }
 
 - (void)setupCustomTickViews {
-    [self createAndAddBlankTickViewsWithCount:(int)[self.ticks count]];
+    [self createAndAddBlankTickViewsWithCount:(NSUInteger)[self.ticks count]];
 }
 
 - (BOOL)areCustomTicksSetupAndNonNull {
     return (self.customTicksEnabled && self.ticks && [self.ticks count] > 0);
 }
 
-- (void)createAndAddBlankTickViewsWithCount:(int)count {
+- (void)createAndAddBlankTickViewsWithCount:(NSUInteger)count {
     NSMutableArray *tickBuilder = [NSMutableArray array];
     for (NSInteger i = 0; i < count; i++) {
         UIView *tick = [self setupCommonTickViewAndAddToSubview];
@@ -445,8 +445,6 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 {
     CGFloat halfValue = (self.minimumValue + self.maximumValue) / 2.0f;
     
-    //TODO: Do we need to do anything special here? What does this do?
-    
     if (self.value > halfValue) {
         self.rightSaturatedImageView.alpha = (self.value - halfValue) / halfValue;
         self.leftSaturatedImageView.alpha = 0;
@@ -596,7 +594,7 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 {
     assert([self areCustomTicksSetupAndNonNull]);
     
-    int tickCount = (int)[self.tickViews count];
+    NSUInteger tickCount = [self.tickViews count];
     
     NSLayoutConstraint *firstLeft = self.middleTickConstraints.firstObject;
     

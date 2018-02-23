@@ -78,7 +78,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *  Inserts a tick at a position.
  *  @param tick. The tick with the set position between 0 and 1
  */
-- (void)addTick:(Tick*)tick  willRefreshView:(bool)refreshView;
+- (void)addTick:(Tick*)tick  willRefreshView:(BOOL)refreshView;
 
 /**
  *  Refreshes the view in a custom way, in case you didn't do it for each tick addition.
@@ -89,7 +89,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *  Removes the tick at the given index. .
  *  @param index. The tick Index with the set position between 0 and 1
  */
-- (void)removeTickAtIndex:(uint)index;
+- (void)removeTickAtIndex:(NSUInteger)index;
 
 /**
  *  Sets the color to use as the fully-saturated color on selected side.
