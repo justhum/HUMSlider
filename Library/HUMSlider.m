@@ -15,7 +15,7 @@ static NSTimeInterval const HUMSecondTickDuration = 0.35;
 static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
-static CGFloat const HUMTickOutToInDifferential = 10;
+static CGFloat const HUMTickOutToInDifferential = 8;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
@@ -806,6 +806,8 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
     }
 }
 
+#warning - thumbHeight method may do the same thing as self thumbImageWidth.
+
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
     assert ([self areCustomTicksSetupAndNonNull]);
@@ -814,18 +816,22 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 
     NSLayoutConstraint *constraint = self.middleTickConstraints[tickIndex];
     
-    CGFloat distanceFromLeft = (trackRect.size.width / 2) + (constraint.constant);
+    CGFloat tickDistanceFromLeft = (trackRect.size.width / 2) + (constraint.constant) + trackRect.origin.x;
     CGFloat thumbSliderRadius = [self thumbImageWidth] / 2;
     
-    CGFloat startSegmentX = distanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
-    CGFloat endSegmentX = distanceFromLeft + thumbSliderRadius;
+    CGFloat startSegmentX = tickDistanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
+    CGFloat endSegmentX = tickDistanceFromLeft + thumbSliderRadius;
     
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
         desiredOrigin = [self tickPoppedPosition];
-        CGFloat Xdiff = fmin(fabs(touchX - startSegmentX), fabs(touchX - endSegmentX));
-        desiredOrigin -= (Xdiff * 0.5);
+        CGFloat Xdiff = fabs(touchX - tickDistanceFromLeft);//fmin(fabs(touchX - startSegmentX), fabs(touchX - endSegmentX));
+        CGFloat zeroBased = Xdiff / ([self thumbImageWidth] / 2);
+        CGFloat diffZeroBased = tan(acos(zeroBased)) * zeroBased;
+        CGFloat diff = (1 - diffZeroBased) * ([self thumbImageWidth] / 2);
+        CGFloat notPopped = [self tickInNotPoppedPositon];
+        desiredOrigin += diff; // Add because the desired origin is negative the higher it pops.
     } else{
         // Bring down.
         desiredOrigin = [self tickInNotPoppedPositon];
@@ -1090,7 +1096,7 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
 
 - (CGFloat)tickPoppedPosition
 {
-    return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential] + self.pointAdjustmentForCustomThumb;
+    return [self tickInNotPoppedPositon] - [self tickInToPoppedDifferential] - self.pointAdjustmentForCustomThumb;
 }
 
 - (CGFloat)tickPixelOffsetFromMiddle:(Tick*)tick {
