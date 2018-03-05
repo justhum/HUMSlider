@@ -15,11 +15,11 @@ static NSTimeInterval const HUMSecondTickDuration = 0.35;
 static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
-static CGFloat const HUMTickOutToInDifferential = 9;
+static CGFloat const HUMTickOutToInDifferential = 8;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
-static CGFloat const HUMTickHeight = 8;
+static CGFloat const HUMTickHeight = 6;
 static CGFloat const HUMTickWidth = 1;
 
 // Default Constants
