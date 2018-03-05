@@ -15,7 +15,7 @@ static NSTimeInterval const HUMSecondTickDuration = 0.35;
 static NSTimeInterval const HUMTickAnimationDelay = 0.025;
 
 // Positions
-static CGFloat const HUMTickOutToInDifferential = 8;
+static CGFloat const HUMTickOutToInDifferential = 10;
 static CGFloat const HUMImagePadding = 8;
 
 // Sizes
@@ -824,6 +824,8 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up.
         desiredOrigin = [self tickPoppedPosition];
+        CGFloat Xdiff = fmin(fabs(touchX - startSegmentX), fabs(touchX - endSegmentX));
+        desiredOrigin -= (Xdiff * 0.5);
     } else{
         // Bring down.
         desiredOrigin = [self tickInNotPoppedPositon];
