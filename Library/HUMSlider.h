@@ -89,7 +89,12 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
  *  Removes the tick at the given index. .
  *  @param index. The tick Index with the set position between 0 and 1
  */
-- (void)removeTickAtIndex:(NSUInteger)index;
+- (void)removeTickAtIndex:(NSUInteger)index refreshView:(BOOL)refreshView;
+
+/**
+ *  Remove all of the ticks
+ */
+- (void)removeAllTicks;
 
 /**
  *  Sets the color to use as the fully-saturated color on selected side.

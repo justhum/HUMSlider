@@ -152,8 +152,21 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
     }
 }
 
-- (void)removeTickAtIndex:(NSUInteger)index {
+- (void)removeTickAtIndex:(NSUInteger)index refreshView:(BOOL)refreshView {
     [_ticks removeObjectAtIndex:index];
+    if (refreshView) {
+        [self setupTickViews];
+        [self updateTickHeights];
+    }
+}
+
+- (void)removeAllTicks {
+    for (NSUInteger i = [_ticks count] - 1; i > 0 ; i--) {
+        [self removeTickAtIndex:i refreshView:NO];
+    }
+    [self removeTickAtIndex:0 refreshView:YES];
+    [self setNeedsLayout];
+    [self nukeOldTickViews];
 }
 
 - (void)nukeOldTickViews
@@ -830,7 +843,6 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
         CGFloat zeroBased = Xdiff / ([self thumbImageWidth] / 2);
         CGFloat diffZeroBased = tan(acos(zeroBased)) * zeroBased;
         CGFloat diff = (1 - diffZeroBased) * ([self thumbImageWidth] / 2);
-        CGFloat notPopped = [self tickInNotPoppedPositon];
         desiredOrigin += diff; // Add because the desired origin is negative the higher it pops.
     } else{
         // Bring down.
