@@ -76,7 +76,8 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 
 /**
  *  Inserts a tick at a position.
- *  @param tick. The tick with the set position between 0 and 1
+ *  @param tick The tick with the set position between 0 and 1
+  *  @param refreshView Will update the view this time with the added tick.
  */
 - (void)addTick:(Tick*)tick  willRefreshView:(BOOL)refreshView;
 
@@ -87,7 +88,8 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 
 /**
  *  Removes the tick at the given index. .
- *  @param index. The tick Index with the set position between 0 and 1
+ *  @param index The tick Index with the set position between 0 and 1
+ *  @param refreshView Will update the view this time with the removed tick.
  */
 - (void)removeTickAtIndex:(NSUInteger)index refreshView:(BOOL)refreshView;
 

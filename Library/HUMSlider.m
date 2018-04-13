@@ -23,7 +23,7 @@ static CGFloat const HUMTickHeight = 6;
 static CGFloat const HUMTickWidth = 1;
 
 // Default Constants
-static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb icon.
+static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb icon.
 
 @implementation Tick
 // Constructor for a tick
@@ -818,8 +818,6 @@ static CGFloat const DefaultThumbPxWidth = 30; //Size of apple's default thumb i
         }
     }
 }
-
-#warning - thumbHeight method may do the same thing as self thumbImageWidth.
 
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
