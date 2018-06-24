@@ -797,8 +797,8 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     if (![NSThread isMainThread]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateTickHeights];
-            return;
         });
+        return;
     }
 
     CGRect trackRect = [self trackRectForBounds:self.bounds];
@@ -1038,6 +1038,13 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
               withDuration:(NSTimeInterval)duration
                      delay:(NSTimeInterval)delay
 {
+    
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self animateTickAtIndex:index toYOrigin:yOrigin withDuration:duration delay:delay];
+        });
+        return;
+    }
     NSLayoutConstraint *constraint = self.allTickBottomConstraints[index];
     constraint.constant = yOrigin;
     
