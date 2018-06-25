@@ -188,29 +188,28 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)setupTickViews
 {
-    if ([self areCustomTicksSetupAndNonNull]) {
-        [self cleanupConstraintsAfterEvenlySpacedTicks];
-        [self setupCustomTickViews];
-        [self setupTicksAutoLayoutCustomWidths];
-        if (!_enableTicksTransparencyOnIdle) {
-            [self animateAllTicksInCustomWidths:YES];
-        }
+    [self cleanupConstraintsAfterCustomSpacedTicks];
+    
+    if (!_customTicksEnabled) {
+        [self setupConsitentlySpacedTickMarks];
     }
-    else {
-        [self cleanupConstraintsAfterCustomSpacedTicks];
-        [self setupSpacedTickViews];
-        [self setupTicksAutolayout];
-        if (!_enableTicksTransparencyOnIdle) {
-            [self animateAllTicksIn:YES];
-        }
+    
+    [self setupCustomTickViews];
+    [self setupTicksAutoLayoutCustomWidths];
+    if (!_enableTicksTransparencyOnIdle) {
+        [self animateAllTicksInCustomWidths:YES];
     }
 }
 
-- (void)cleanupConstraintsAfterEvenlySpacedTicks {
-    self.tickViews = [NSArray new]; // Make sure these get re-initialized
-    [self clearLayoutConstraintList:_leftTickRightConstraints];
-    [self clearLayoutConstraintList:_rightTickLeftConstraints];
-    [self clearLayoutConstraintList:_allTickBottomConstraints];
+// Setup evenly spaced ticks per sectionCount
+- (void)setupConsitentlySpacedTickMarks {
+    CGFloat tickDistances = 1 / (self.sectionCount + 1);
+    CGFloat spacingSoFar = 0;
+    for (int i = 0 ; i < self.sectionCount ; i++) {
+        Tick *newTick = [[Tick alloc] initWithPosition:spacingSoFar + tickDistances];
+        [self.ticks addObject:newTick];
+        spacingSoFar += tickDistances;
+    }
 }
 
 - (void)cleanupConstraintsAfterCustomSpacedTicks {
@@ -236,10 +235,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     [self createAndAddBlankTickViewsWithCount:(NSUInteger)[self.ticks count]];
 }
 
-- (BOOL)areCustomTicksSetupAndNonNull {
-    return (self.customTicksEnabled && self.ticks && [self.ticks count] > 0);
-}
-
 - (void)createAndAddBlankTickViewsWithCount:(NSUInteger)count {
     NSMutableArray *tickBuilder = [NSMutableArray array];
     for (NSInteger i = 0; i < count; i++) {
@@ -263,9 +258,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 #pragma mark Autolayout
 
 - (void)setupTicksAutoLayoutCustomWidths {
-    
-    assert([self areCustomTicksSetupAndNonNull]);
-    
     //Store the position and bottom constraints for some reason
     NSMutableArray *bottoms = [NSMutableArray array];
     NSMutableArray *middleConstraints = [NSMutableArray array];
@@ -299,81 +291,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     self.allTickBottomConstraints = bottoms;
     self.middleTickConstraints = middleConstraints;
 
-    [self layoutIfNeeded];
-}
-
-- (void)setupTicksAutolayout
-{
-    assert(![self areCustomTicksSetupAndNonNull]);
-    
-    NSMutableArray *bottoms = [NSMutableArray array];
-    NSMutableArray *lefts = [NSMutableArray array];
-    NSMutableArray *rights = [NSMutableArray array];
-    
-    UIView *middleTick = self.tickViews[self.middleTickIndex];
-    [self pinTickWidthAndHeight:middleTick];
-    NSLayoutConstraint *midBottom = [self pinTickBottom:middleTick];
-    [bottoms addObject:midBottom];
-    
-    // Pin the middle tick to the middle of the slider.
-    [self addConstraint:[NSLayoutConstraint constraintWithItem:middleTick
-                                                     attribute:NSLayoutAttributeCenterX
-                                                     relatedBy:NSLayoutRelationEqual
-                                                        toItem:self
-                                                     attribute:NSLayoutAttributeCenterX
-                                                    multiplier:1
-                                                      constant:0]];
-    
-    for (NSInteger i = 0; i < self.middleTickIndex; i++) {
-        NSInteger previousLowest = self.middleTickIndex - i;
-        NSInteger previousHighest = self.middleTickIndex + i;
-        
-        NSInteger nextLowest = self.middleTickIndex - (i + 1);
-        NSInteger nextHighest = self.middleTickIndex + (i + 1);
-        
-        UIView *nextToLeft = self.tickViews[nextLowest];
-        UIView *nextToRight = self.tickViews[nextHighest];
-        
-        UIView *previousToLeft = self.tickViews[previousLowest];
-        UIView *previousToRight = self.tickViews[previousHighest];
-        
-        // Pin widths, heights, and bottoms.
-        [self pinTickWidthAndHeight:nextToLeft];
-        NSLayoutConstraint *leftBottom = [self pinTickBottom:nextToLeft];
-        [bottoms insertObject:leftBottom atIndex:0];
-        
-        [self pinTickWidthAndHeight:nextToRight];
-        NSLayoutConstraint *rightBottom = [self pinTickBottom:nextToRight];
-        [bottoms addObject:rightBottom];
-        
-        // Pin the right of the next leftwards tick to the previous leftwards tick
-        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:nextToLeft
-                                                                attribute:NSLayoutAttributeRight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:previousToLeft
-                                                                attribute:NSLayoutAttributeLeft
-                                                               multiplier:1
-                                                                 constant:-(self.segmentWidth - HUMTickWidth)];
-        [self addConstraint:left];
-        [lefts addObject:left];
-        
-        // Pin the left of the next rightwards tick to the previous rightwards tick.
-        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:nextToRight
-                                                                 attribute:NSLayoutAttributeLeft
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:previousToRight
-                                                                 attribute:NSLayoutAttributeRight
-                                                                multiplier:1
-                                                                  constant:(self.segmentWidth - HUMTickWidth)];
-        [self addConstraint:right];
-        [rights addObject:right];
-        
-    }
-    
-    self.allTickBottomConstraints = bottoms;
-    self.leftTickRightConstraints = lefts;
-    self.rightTickLeftConstraints = rights;
-    
     [self layoutIfNeeded];
 }
 
@@ -573,37 +490,12 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     trackRect = [self trackRectForBounds:self.bounds];
     
     [super layoutSubviews];
-    if ([self areCustomTicksSetupAndNonNull]) {
-        [self updateCustomTickConstraintsIfNeeded];
-    }
-    else {
-        [self updateLeftTickConstraintsIfNeeded];
-    }
-}
 
-// First method that is called when animating ticks in.
-- (void)updateLeftTickConstraintsIfNeeded
-{
-    assert(![self areCustomTicksSetupAndNonNull]);
-    
-    NSLayoutConstraint *firstLeft = self.leftTickRightConstraints.firstObject;
-    
-    if (firstLeft.constant != (self.segmentWidth - HUMTickWidth)) {
-        for (NSInteger i = 0; i < self.middleTickIndex; i++) {
-            NSLayoutConstraint *leftConstraint = self.rightTickLeftConstraints[i];
-            NSLayoutConstraint *rightConstraint = self.leftTickRightConstraints[i];
-            leftConstraint.constant = (self.segmentWidth - HUMTickWidth);
-            rightConstraint.constant = -(self.segmentWidth - HUMTickWidth);
-        }
-        
-        [self layoutIfNeeded];
-    } // else good to go.
+    [self updateCustomTickConstraintsIfNeeded];
 }
 
 - (void)updateCustomTickConstraintsIfNeeded
 {
-    assert([self areCustomTicksSetupAndNonNull]);
-    
     NSUInteger tickCount = [self.tickViews count];
     
     NSLayoutConstraint *firstLeft = self.middleTickConstraints.firstObject;
@@ -636,7 +528,9 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 - (void)setSectionCount:(NSUInteger)sectionCount
 {
     // Warn the developer that they need to use an odd number of sections.
-    NSAssert(sectionCount % 2 != 0, @"Must use an odd number of sections!");
+    if (_customTicksEnabled) {
+        NSLog(@"WARNING: Custom ticks are enabled so section count won't do much");
+    }
     
     _sectionCount = sectionCount;
     
@@ -779,14 +673,8 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (BOOL)beginTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    if ([self areCustomTicksSetupAndNonNull]) {
-        [self updateCustomTickConstraintsIfNeeded];
-        [self animateAllTicksInCustomWidths:YES];
-    }
-    else {
-        [self updateLeftTickConstraintsIfNeeded];
-        [self animateAllTicksIn:YES];
-    }
+    [self updateCustomTickConstraintsIfNeeded];
+    [self animateAllTicksInCustomWidths:YES];
     
     [self popTickIfNeededFromTouch:touch];
     
@@ -810,19 +698,12 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     
     // Animate tick based on the thumb location
     for (NSInteger i = 0; i < self.tickViews.count; i++) {
-        if ([self areCustomTicksSetupAndNonNull]) {
-            [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
-        }
-        else {
-            [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
-        }
+        [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
     }
 }
 
 - (void)animateCustomTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
 {
-    assert ([self areCustomTicksSetupAndNonNull]);
-    
     UIView *tick = self.tickViews[tickIndex];
 
     NSLayoutConstraint *constraint = self.middleTickConstraints[tickIndex];
@@ -855,32 +736,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     } // else tick is already where it needs to be.
 }
 
-- (void)animateTickIfNeededAtIndex:(NSInteger)tickIndex forTouchX:(CGFloat)touchX
-{
-    assert (![self areCustomTicksSetupAndNonNull]);
-    
-    UIView *tick = self.tickViews[tickIndex];
-    
-    CGFloat startSegmentX = (tickIndex * self.segmentWidth) + self.trackXOrigin;
-    CGFloat endSegmentX = startSegmentX + self.segmentWidth;
-    
-    CGFloat desiredOrigin;
-    if (startSegmentX <= touchX && endSegmentX > touchX) {
-        // Pop up.
-        desiredOrigin = [self tickPoppedPosition];
-    } else {
-        // Bring down.
-        desiredOrigin = [self tickInNotPoppedPositon];
-    }
-    
-    if (CGRectGetMinY(tick.frame) != desiredOrigin) {
-        [self animateTickAtIndex:tickIndex
-                       toYOrigin:desiredOrigin
-                    withDuration:self.tickMovementAnimationDuration
-                           delay:0];
-    } // else tick is already where it needs to be.
-}
-
 - (BOOL)continueTrackingWithTouch:(UITouch *)touch withEvent:(UIEvent *)event
 {
     [self popTickIfNeededFromTouch:touch];
@@ -898,12 +753,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     
     // Animate tick based on the thumb location
     for (NSInteger i = 0; i < self.tickViews.count; i++) {
-        if ([self areCustomTicksSetupAndNonNull]) {
-            [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
-        }
-        else {
-            [self animateTickIfNeededAtIndex:i forTouchX:sliderLoc];
-        }
+        [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
     }
 }
 
@@ -936,19 +786,14 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
         return;
     }
 
-    if ([self areCustomTicksSetupAndNonNull]) {
-        [self animateAllTicksInCustomWidths:NO];
-    }
-    else {
-        [self animateAllTicksIn:NO];
-    }
+    [self animateAllTicksInCustomWidths:NO];
 }
+
+#pragma mark - Tick Animation
 
 // To Remove - my method for custom widths
 - (void)animateAllTicksInCustomWidths:(BOOL)inPosition
 {
-    assert([self areCustomTicksSetupAndNonNull] == true);
-    
     CGFloat origin;
     CGFloat alpha;
     
@@ -973,63 +818,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
                        toYOrigin:origin
                     withDuration:self.tickMovementAnimationDuration
                            delay:self.nextTickAnimationDelay * i];
-    }
-}
-
-#pragma mark - Tick Animation
-
-- (void)animateAllTicksIn:(BOOL)inPosition
-{
-    assert([self areCustomTicksSetupAndNonNull] == false);
-    
-    CGFloat origin;
-    CGFloat alpha;
-    
-    if (inPosition) { // Ticks are out, coming in
-        alpha = 1;
-        origin = [self tickInNotPoppedPositon];
-    } else { // Ticks are in, coming out.
-        alpha = _enableTicksTransparencyOnIdle ? 0 : 1;
-        origin = [self tickOutPosition];
-    }
-    
-    [UIView animateWithDuration:self.tickAlphaAnimationDuration
-                     animations:^{
-                         for (UIView *tick in self.tickViews) {
-                             tick.alpha = alpha;
-                         }
-                     } completion:nil];
-    
-    for (NSInteger i = 0; i <= self.middleTickIndex; i++) {
-        NSInteger nextHighest = self.middleTickIndex + i;
-        NSInteger nextLowest = self.middleTickIndex - i;
-        if (nextHighest == nextLowest) {
-            // Middle tick
-            [self animateTickAtIndex:nextHighest
-                           toYOrigin:origin
-                        withDuration:self.tickMovementAnimationDuration
-                               delay:0];
-        } else if (nextHighest - nextLowest == 2) {
-            // Second tick
-            [self animateTickAtIndex:nextHighest
-                           toYOrigin:origin
-                        withDuration:self.secondTickMovementAndimationDuration
-                               delay:self.nextTickAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest
-                           toYOrigin:origin
-                        withDuration:self.secondTickMovementAndimationDuration
-                               delay:self.nextTickAnimationDelay * i];
-        } else {
-            // Rest of ticks
-            [self animateTickAtIndex:nextHighest
-                           toYOrigin:origin
-                        withDuration:self.tickMovementAnimationDuration
-                               delay:self.nextTickAnimationDelay * i];
-            [self animateTickAtIndex:nextLowest
-                           toYOrigin:origin
-                        withDuration:self.tickMovementAnimationDuration
-                               delay:self.nextTickAnimationDelay * i];
-        }
     }
 }
 
