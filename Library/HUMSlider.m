@@ -3,10 +3,13 @@
 //  HUMSliderSample
 //
 //  Created by Ellen Shapiro on 12/26/14.
-//  Copyright (c) 2014 Just Hum, LLC. All rights reserved.
+//  Edited by Jeffrey Blayney 6/26/18
+//  Copyright (c) 2018 Meatloaf For Everyone LLC
 //
 
 #import "HUMSlider.h"
+
+#define ROUNDF(f, c) (((float)((int)((f) * (c))) / (c)))
 
 // Animation Durations
 static NSTimeInterval const HUMTickAlphaDuration = 0.20;
@@ -28,6 +31,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 @implementation Tick
 // Constructor for a tick
 - (id)initWithPosition:(CGFloat)position {
+    position = ROUNDF(position, 1000); // Round to three decimal places
     NSAssert(position >= 0 && position <= 1, @"Position must be between 0 and 1");
     self = [super init];
     if (self) {
@@ -87,7 +91,9 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     self.nextTickAnimationDelay = HUMTickAnimationDelay;
     
     //Private var init
-    self.ticks = [[NSMutableArray alloc] init];
+    if (self.ticks == nil) {
+        self.ticks = [NSMutableArray new];
+    }
     
     //These will set the side colors.
     self.saturatedColor = [UIColor redColor];
@@ -128,9 +134,18 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     return self;
 }
 
+- (void)setCustomTicksEnabled:(BOOL)customTicksEnabled {
+    if (customTicksEnabled != self.customTicksEnabled) {
+        _customTicksEnabled = customTicksEnabled;
+        self.ticks = [NSMutableArray new];
+    }
+}
+
 #pragma mark - Ticks
 
 - (void)addTick:(Tick*)tick willRefreshView:(BOOL)refreshView {
+    
+    assert(_customTicksEnabled);
     
     if ([self.ticks count] == 0) {
         [self.ticks addObject:tick];
@@ -194,6 +209,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
         [self setupConsitentlySpacedTickMarks];
     }
     
+    [self nukeOldTickViews];
     [self setupCustomTickViews];
     [self setupTicksAutoLayoutCustomWidths];
     if (!_enableTicksTransparencyOnIdle) {
@@ -203,7 +219,8 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 // Setup evenly spaced ticks per sectionCount
 - (void)setupConsitentlySpacedTickMarks {
-    CGFloat tickDistances = 1 / (self.sectionCount + 1);
+    self.ticks = [NSMutableArray new];
+    CGFloat tickDistances = 1.0 / (self.sectionCount + 1);
     CGFloat spacingSoFar = 0;
     for (int i = 0 ; i < self.sectionCount ; i++) {
         Tick *newTick = [[Tick alloc] initWithPosition:spacingSoFar + tickDistances];
@@ -237,7 +254,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)createAndAddBlankTickViewsWithCount:(NSUInteger)count {
     NSMutableArray *tickBuilder = [NSMutableArray array];
-    for (NSInteger i = 0; i < count; i++) {
+    for (NSUInteger i = 0; i < count; i++) {
         UIView *tick = [self setupCommonTickViewAndAddToSubview];
         [tickBuilder addObject:tick];
     }
@@ -497,6 +514,10 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 - (void)updateCustomTickConstraintsIfNeeded
 {
     NSUInteger tickCount = [self.tickViews count];
+    
+    if (tickCount == 0) {
+        return;
+    }
     
     NSLayoutConstraint *firstLeft = self.middleTickConstraints.firstObject;
     
