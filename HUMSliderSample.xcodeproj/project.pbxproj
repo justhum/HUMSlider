@@ -10,7 +10,7 @@
 		331B859420ECB7CF00C16AD7 /* HUMSlider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; };
 		331B859520ECB7CF00C16AD7 /* HUMSlider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		331B859A20ECB7DA00C16AD7 /* HUMSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA868061A4DF3DF00121ED5 /* HUMSlider.m */; };
-		331B859B20ECB81700C16AD7 /* HUMSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BA868051A4DF3DF00121ED5 /* HUMSlider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = 331B859C20ECB90000C16AD7 /* HUMSlider.h */; };
 		9BA867E11A4DF3B900121ED5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E01A4DF3B900121ED5 /* main.m */; };
 		9BA867E41A4DF3B900121ED5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E31A4DF3B900121ED5 /* AppDelegate.m */; };
 		9BA867E71A4DF3B900121ED5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E61A4DF3B900121ED5 /* ViewController.m */; };
@@ -46,6 +46,7 @@
 /* Begin PBXFileReference section */
 		331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HUMSlider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		331B859020ECB7CF00C16AD7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		331B859C20ECB90000C16AD7 /* HUMSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUMSlider.h; sourceTree = "<group>"; };
 		9BA867DB1A4DF3B900121ED5 /* HUMSliderSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HUMSliderSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BA867DF1A4DF3B900121ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BA867E01A4DF3B900121ED5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -56,7 +57,6 @@
 		9BA867E91A4DF3B900121ED5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9BA867EB1A4DF3B900121ED5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9BA867EE1A4DF3B900121ED5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		9BA868051A4DF3DF00121ED5 /* HUMSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HUMSlider.h; path = ../Library/HUMSlider.h; sourceTree = "<group>"; };
 		9BA868061A4DF3DF00121ED5 /* HUMSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HUMSlider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -82,7 +82,7 @@
 		331B858E20ECB7CF00C16AD7 /* HUMSlider */ = {
 			isa = PBXGroup;
 			children = (
-				9BA868051A4DF3DF00121ED5 /* HUMSlider.h */,
+				331B859C20ECB90000C16AD7 /* HUMSlider.h */,
 				9BA868061A4DF3DF00121ED5 /* HUMSlider.m */,
 				331B859020ECB7CF00C16AD7 /* Info.plist */,
 			);
@@ -138,7 +138,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331B859B20ECB81700C16AD7 /* HUMSlider.h in Headers */,
+				331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
