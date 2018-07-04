@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+//! Project version number for HUMSlider.
+FOUNDATION_EXPORT double HUMSliderVersionNumber;
+
+//! Project version string for HUMSlider.
+FOUNDATION_EXPORT const unsigned char HUMSliderVersionString[];
+
+
 typedef NS_ENUM(NSUInteger, HUMSliderSide) {
     HUMSliderSideLeft,
     HUMSliderSideRight
