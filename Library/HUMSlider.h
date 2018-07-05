@@ -3,7 +3,7 @@
 //  HUMSliderSample
 //
 //  Created by Ellen Shapiro on 12/26/14.
-//  Copyright (c) 2014 Just Hum, LLC. All rights reserved.
+//  Edited by Jeffrey Blayney 6/26/18
 //
 
 #import <UIKit/UIKit.h>
@@ -14,7 +14,9 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 };
 
 @interface Tick : NSObject
+///Constructor for tick with position between and including 0 and 1
 - (id)initWithPosition:(CGFloat)position;
+///Position property with position between and including 0 and 1
 @property CGFloat position; //Number between 0 and 1 indicating the slider position of the tick.
 @end
 

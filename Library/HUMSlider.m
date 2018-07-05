@@ -4,7 +4,6 @@
 //
 //  Created by Ellen Shapiro on 12/26/14.
 //  Edited by Jeffrey Blayney 6/26/18
-//  Copyright (c) 2018 Meatloaf For Everyone LLC
 //
 
 #import "HUMSlider.h"
@@ -31,7 +30,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 @implementation Tick
 // Constructor for a tick
 - (id)initWithPosition:(CGFloat)position {
-    position = ROUNDF(position, 1000); // Round to three decimal places
+    position = ROUNDF(position, 1000); // Round to three decimal places to eliminate chances of float inprecision on comparisons.
     NSAssert(position >= 0 && position <= 1, @"Position must be between 0 and 1");
     self = [super init];
     if (self) {
@@ -222,7 +221,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     self.ticks = [NSMutableArray new];
     CGFloat tickDistances = 1.0 / (self.sectionCount + 1);
     CGFloat spacingSoFar = 0;
-    for (int i = 0 ; i < self.sectionCount ; i++) {
+    for (NSUInteger i = 0 ; i < self.sectionCount ; i++) {
         Tick *newTick = [[Tick alloc] initWithPosition:spacingSoFar + tickDistances];
         [self.ticks addObject:newTick];
         spacingSoFar += tickDistances;
