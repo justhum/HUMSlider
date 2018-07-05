@@ -33,7 +33,7 @@ A quick programmatic example of the most common use case:
     slider.desaturatedColor = [[UIColor redColor] colorWithAlpha:0.5f]; 
     
     // How many ticks do you want?  (Only works if customTicksEnabled == false)
-    slider.sectionCount = 11; // This should be an odd number.
+    slider.sectionCount = 11;
     
     // What color should the ticks be?
     slider.tickColor = [UIColor blackColor];    
@@ -75,7 +75,6 @@ Full code is available in the sample app included in this repo.
 
 ## Usage notes
 
-- The number of ticks **must be odd** - otherwise pretty much all the math for centering things breaks spectacularly. Attempting to add an even number of ticks will cause an assertion failure during development.
 - If you are using a custom thumb image which has some clear space at the top, use the `pointAdjustmentForCustomThumb` property to compensate for this. 
 - This control defines its own intrinsic content height based on how high the ticks will pop up, but does not define its own intrinsic content width. 
 - Images passed in as min/max images will automatically be set to use `UIImageRenderingModeAlwaysTemplate` in order to facilitate the saturation and desaturation of the image using tint colors.
