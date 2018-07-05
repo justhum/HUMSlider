@@ -22,8 +22,8 @@ A quick programmatic example of the most common use case:
 ```objectivec
     HUMSlider *slider = [[HUMSlider alloc] init];
 
-	// Set the images to be saturated and desaturated
-	slider.minimumValueImage = [UIImage imageNamed:@"minImage"];
+    // Set the images to be saturated and desaturated
+    slider.minimumValueImage = [UIImage imageNamed:@"minImage"];
     slider.maximumValueImage = [UIImage imageNamed:@"maxImage"];
     
     // What color should the image be when the thumb is close to it?
@@ -64,14 +64,14 @@ A quick programmatic example of the most common use case:
 ## Custom Tracking
 
 - Simply call the updateTickHeights method regularly if you are programmatically
-  moving the slider, and want the ticks the same as if the user is moving them.
+  moving the slider, and want the ticks to appear the same as if the user is moving them.
 
 ```objectivec
    [slider updateTickHeights]
 ```
 
 
-Full code is available in the sample app included in this repo. 
+Code for constant spaced ticks is available in the sample app included in this repo. 
 
 ## Usage notes
 
