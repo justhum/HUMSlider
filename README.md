@@ -38,13 +38,13 @@ A quick programmatic example of the most common use case:
     // What color should the ticks be?
     slider.tickColor = [UIColor blackColor];    
 
-    //Turns the custom tick feature on and off, defaults to NO
+    // Turns the custom tick feature on and off, defaults to NO
     slider.customTicksEnabled = YES;
 
-    //Ticks animate down to track line when user is not actively moving the slider. Defaults to YES
+    // Ticks animate down to track line when user is not actively moving the slider. Defaults to YES
     slider.lowerTicksOnInactiveTouch = NO; 
 
-    //Ticks will fade out when the user is not actively moving the touch slider. Defaults to YES
+    // Ticks will fade out when the user is not actively moving the touch slider. Defaults to YES
     slider.enableTicksTransparencyOnIdle = NO; 
 ```
 
@@ -52,18 +52,18 @@ A quick programmatic example of the most common use case:
 
 ```objectivec
 
-    //Init custom ticks with one tick, at 1/3 position up the slider. If adding many, refresh view on final addition.
+    // Init custom ticks with one tick, at 1/3 position up the slider. If adding many, refresh view on final addition.
+    slider.customTicksEnabled = true;
     Tick *oneThird = [[Tick alloc] initWithPosition: 0.333];
     [slider addTick:oneThird willRefreshView:true];
-    slider.customTicksEnabled = true;
 
-    //Tick Removal
+    // Tick Removal
     [slider removeTickAtIndex:0];
 ```
 
 ## Custom Tracking
 
-- Simply call the updateTickHeights method regularly if you are programmatically
+Simply call the updateTickHeights method regularly if you are programmatically
   moving the slider, and want the ticks to appear the same as if the user is moving them.
 
 ```objectivec

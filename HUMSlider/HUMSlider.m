@@ -88,12 +88,12 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     self.secondTickMovementAndimationDuration = HUMSecondTickDuration;
     self.nextTickAnimationDelay = HUMTickAnimationDelay;
     
-    //Private var init
+    // Private var init
     if (self.ticks == nil) {
         self.ticks = [NSMutableArray new];
     }
     
-    //These will set the side colors.
+    // These will set the side colors.
     self.saturatedColor = [UIColor redColor];
     self.desaturatedColor = [UIColor lightGrayColor];
     
@@ -147,7 +147,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)addTick:(Tick*)tick willRefreshView:(BOOL)refreshView {
     
-    assert(_customTicksEnabled);
+    NSAssert(self.customTicksEnabled, @"Custom ticks must be enabled to use the add Tick API method.");
     
     if ([self.ticks count] == 0) {
         [self.ticks addObject:tick];
@@ -175,10 +175,10 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)removeTickAtIndex:(NSUInteger)index refreshView:(BOOL)refreshView {
     
-    //remove the tick object itself
+    // Remove the tick object itself
     [self.ticks removeObjectAtIndex:index];
     
-    //remove the view and remove tracked constraints, the view removes constraints as part of "removeFromSuperview"
+    // Remove the view and remove tracked constraints, the view removes constraints as part of "removeFromSuperview"
     [self removeConstraintFromList:self.middleTickConstraints constraintAtIndex:index];
     [self removeConstraintFromList:self.allTickBottomConstraints constraintAtIndex:index];
     UIView *tickView = [self.tickViews objectAtIndex:index];
@@ -219,7 +219,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 // Setup evenly spaced ticks per sectionCount
 - (void)setupConsitentlySpacedTickMarks {
-    assert(!self.customTicksEnabled);
+    NSAssert(!self.customTicksEnabled, @"Internal Consistency - should not be setting up consistently spaced tick marks here.");
     self.ticks = [NSMutableArray new];
     CGFloat tickDistances = 1.0 / (self.sectionCount + 1);
     CGFloat spacingSoFar = 0;
@@ -283,7 +283,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
         [self layoutIfNeeded];
 }
 
-//Size of the tick itself.
+// Size of the tick itself.
 - (void)pinTickWidthAndHeight:(UIView *)currentTick
 {
     // Pin width of tick
@@ -474,9 +474,9 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)checkIntegrity {
     // Transitivity
-    assert([self.middleTickConstraints count] == [self.allTickBottomConstraints count]);
-    assert([self.allTickBottomConstraints count] == [self.tickViews count]);
-    assert([self.tickViews count] == [self.ticks count]);
+    NSAssert([self.middleTickConstraints count] == [self.allTickBottomConstraints count], @"Internal Consistency Error");
+    NSAssert([self.allTickBottomConstraints count] == [self.tickViews count], @"Internal Consistency Error");
+    NSAssert([self.tickViews count] == [self.ticks count], @"Internal Consistency Error");
 }
 
 #pragma mark - General layout
@@ -492,9 +492,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)updateCustomTickConstraintsIfNeeded
 {
-    NSUInteger tickCount = [self.tickViews count];
-    
-    if (tickCount == 0) {
+    if ([self.tickViews count] == 0) {
         return;
     }
     
@@ -506,8 +504,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     
     if (firstLeft.constant != constant) {
 
-        //This is the new code to start at the first one.
-        for (NSInteger i = 0; i < tickCount; i++) {
+        for (NSInteger i = 0; i < [self.tickViews count]; i++) {
             NSLayoutConstraint *middleConstraint = self.middleTickConstraints[i];
             Tick *theTick = self.ticks[i];
             middleConstraint.constant = [self tickPixelOffsetFromMiddle:theTick];
@@ -722,14 +719,14 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     CGFloat tickDistanceFromLeft = (trackRect.size.width / 2) + (constraint.constant) + trackRect.origin.x;
     CGFloat thumbSliderRadius = [self thumbImageWidth] / 2;
     
-    CGFloat startSegmentX = tickDistanceFromLeft - thumbSliderRadius; //TODO: Make a constant for the interval - from AdjustedThumbSlider subclass.
+    CGFloat startSegmentX = tickDistanceFromLeft - thumbSliderRadius;
     CGFloat endSegmentX = tickDistanceFromLeft + thumbSliderRadius;
     
     CGFloat desiredOrigin;
     if (startSegmentX <= touchX && endSegmentX > touchX) {
         // Pop up and meld tick to slide over the thumb image as it passes by, which can be slow on playback.
         desiredOrigin = [self tickPoppedPosition];
-        CGFloat Xdiff = fabs(touchX - tickDistanceFromLeft); //fmin(fabs(touchX - startSegmentX), fabs(touchX - endSegmentX));
+        CGFloat Xdiff = fabs(touchX - tickDistanceFromLeft);
         CGFloat zeroBased = Xdiff / ([self thumbImageWidth] / 2);
         CGFloat diffZeroBased = tan(acos(zeroBased)) * zeroBased;
         CGFloat diff = (1 - diffZeroBased) * ([self thumbImageWidth] / 2);
@@ -924,11 +921,11 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 - (CGFloat)thumbImageWidth
 {
     double imgThumbImageWidth = self.currentThumbImage.size.width;
-    //CASE if the thumb image width is set, is nonzero and doesn't match our current var, set the var to the correct value.
+    // CASE if the thumb image width is set, is nonzero and doesn't match our current var, set the var to the correct value.
     if (imgThumbImageWidth && imgThumbImageWidth != 0 && imgThumbImageWidth != thumbImageWidth) {
         thumbImageWidth = imgThumbImageWidth;
     }
-    //CASE: if it isn't set or is 0, it is wrong - it will use apple's default thumb image size.
+    // CASE: if it isn't set or is 0, it is wrong - it will use apple's default thumb image size.
     else if (!thumbImageWidth || thumbImageWidth == 0) { // No custom image set, use apple's default
         thumbImageWidth = DefaultThumbPxWidth;
     }

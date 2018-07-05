@@ -7,27 +7,46 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		331B859420ECB7CF00C16AD7 /* HUMSlider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; };
+		331B859520ECB7CF00C16AD7 /* HUMSlider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		331B859A20ECB7DA00C16AD7 /* HUMSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA868061A4DF3DF00121ED5 /* HUMSlider.m */; };
+		331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = 331B859C20ECB90000C16AD7 /* HUMSlider.h */; };
 		9BA867E11A4DF3B900121ED5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E01A4DF3B900121ED5 /* main.m */; };
 		9BA867E41A4DF3B900121ED5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E31A4DF3B900121ED5 /* AppDelegate.m */; };
 		9BA867E71A4DF3B900121ED5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E61A4DF3B900121ED5 /* ViewController.m */; };
 		9BA867EA1A4DF3B900121ED5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9BA867E81A4DF3B900121ED5 /* Main.storyboard */; };
 		9BA867EC1A4DF3B900121ED5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BA867EB1A4DF3B900121ED5 /* Images.xcassets */; };
 		9BA867EF1A4DF3B900121ED5 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9BA867ED1A4DF3B900121ED5 /* LaunchScreen.xib */; };
-		9BA867FB1A4DF3B900121ED5 /* HUMSliderSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867FA1A4DF3B900121ED5 /* HUMSliderSampleTests.m */; };
-		9BA868071A4DF3DF00121ED5 /* HUMSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA868061A4DF3DF00121ED5 /* HUMSlider.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9BA867F51A4DF3B900121ED5 /* PBXContainerItemProxy */ = {
+		331B859220ECB7CF00C16AD7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9BA867D31A4DF3B900121ED5 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 9BA867DA1A4DF3B900121ED5;
-			remoteInfo = HUMSliderSample;
+			remoteGlobalIDString = 331B858C20ECB7CF00C16AD7;
+			remoteInfo = HUMSlider;
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		331B859920ECB7D000C16AD7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				331B859520ECB7CF00C16AD7 /* HUMSlider.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HUMSlider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		331B859020ECB7CF00C16AD7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		331B859C20ECB90000C16AD7 /* HUMSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUMSlider.h; sourceTree = "<group>"; };
 		9BA867DB1A4DF3B900121ED5 /* HUMSliderSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HUMSliderSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BA867DF1A4DF3B900121ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BA867E01A4DF3B900121ED5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -38,36 +57,43 @@
 		9BA867E91A4DF3B900121ED5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		9BA867EB1A4DF3B900121ED5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9BA867EE1A4DF3B900121ED5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		9BA867F41A4DF3B900121ED5 /* HUMSliderSampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HUMSliderSampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BA867F91A4DF3B900121ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9BA867FA1A4DF3B900121ED5 /* HUMSliderSampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HUMSliderSampleTests.m; sourceTree = "<group>"; };
-		9BA868051A4DF3DF00121ED5 /* HUMSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUMSlider.h; sourceTree = "<group>"; };
 		9BA868061A4DF3DF00121ED5 /* HUMSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HUMSlider.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9BA867D81A4DF3B900121ED5 /* Frameworks */ = {
+		331B858920ECB7CF00C16AD7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9BA867F11A4DF3B900121ED5 /* Frameworks */ = {
+		9BA867D81A4DF3B900121ED5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				331B859420ECB7CF00C16AD7 /* HUMSlider.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		331B858E20ECB7CF00C16AD7 /* HUMSlider */ = {
+			isa = PBXGroup;
+			children = (
+				331B859C20ECB90000C16AD7 /* HUMSlider.h */,
+				9BA868061A4DF3DF00121ED5 /* HUMSlider.m */,
+				331B859020ECB7CF00C16AD7 /* Info.plist */,
+			);
+			path = HUMSlider;
+			sourceTree = "<group>";
+		};
 		9BA867D21A4DF3B900121ED5 = {
 			isa = PBXGroup;
 			children = (
 				9BA867DD1A4DF3B900121ED5 /* HUMSliderSample */,
-				9BA867F71A4DF3B900121ED5 /* HUMSliderSampleTests */,
+				331B858E20ECB7CF00C16AD7 /* HUMSlider */,
 				9BA867DC1A4DF3B900121ED5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,7 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				9BA867DB1A4DF3B900121ED5 /* HUMSliderSample.app */,
-				9BA867F41A4DF3B900121ED5 /* HUMSliderSampleTests.xctest */,
+				331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -88,7 +114,6 @@
 				9BA867E31A4DF3B900121ED5 /* AppDelegate.m */,
 				9BA867E51A4DF3B900121ED5 /* ViewController.h */,
 				9BA867E61A4DF3B900121ED5 /* ViewController.m */,
-				9BA868041A4DF3CC00121ED5 /* Library */,
 				9BA867E81A4DF3B900121ED5 /* Main.storyboard */,
 				9BA867EB1A4DF3B900121ED5 /* Images.xcassets */,
 				9BA867ED1A4DF3B900121ED5 /* LaunchScreen.xib */,
@@ -106,35 +131,38 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		9BA867F71A4DF3B900121ED5 /* HUMSliderSampleTests */ = {
-			isa = PBXGroup;
-			children = (
-				9BA867FA1A4DF3B900121ED5 /* HUMSliderSampleTests.m */,
-				9BA867F81A4DF3B900121ED5 /* Supporting Files */,
-			);
-			path = HUMSliderSampleTests;
-			sourceTree = "<group>";
-		};
-		9BA867F81A4DF3B900121ED5 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				9BA867F91A4DF3B900121ED5 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		9BA868041A4DF3CC00121ED5 /* Library */ = {
-			isa = PBXGroup;
-			children = (
-				9BA868051A4DF3DF00121ED5 /* HUMSlider.h */,
-				9BA868061A4DF3DF00121ED5 /* HUMSlider.m */,
-			);
-			path = Library;
-			sourceTree = SOURCE_ROOT;
-		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		331B858A20ECB7CF00C16AD7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		331B858C20ECB7CF00C16AD7 /* HUMSlider */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 331B859620ECB7D000C16AD7 /* Build configuration list for PBXNativeTarget "HUMSlider" */;
+			buildPhases = (
+				331B858820ECB7CF00C16AD7 /* Sources */,
+				331B858920ECB7CF00C16AD7 /* Frameworks */,
+				331B858A20ECB7CF00C16AD7 /* Headers */,
+				331B858B20ECB7CF00C16AD7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HUMSlider;
+			productName = HUMSlider;
+			productReference = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		9BA867DA1A4DF3B900121ED5 /* HUMSliderSample */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9BA867FE1A4DF3B900121ED5 /* Build configuration list for PBXNativeTarget "HUMSliderSample" */;
@@ -143,33 +171,17 @@
 				9BA867D81A4DF3B900121ED5 /* Frameworks */,
 				9BA867D91A4DF3B900121ED5 /* Resources */,
 				OBJCLEANCUSTOMRUNSCRIPTT /* Objective-Clean Run Script */,
+				331B859920ECB7D000C16AD7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				331B859320ECB7CF00C16AD7 /* PBXTargetDependency */,
 			);
 			name = HUMSliderSample;
 			productName = HUMSliderSample;
 			productReference = 9BA867DB1A4DF3B900121ED5 /* HUMSliderSample.app */;
 			productType = "com.apple.product-type.application";
-		};
-		9BA867F31A4DF3B900121ED5 /* HUMSliderSampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9BA868011A4DF3B900121ED5 /* Build configuration list for PBXNativeTarget "HUMSliderSampleTests" */;
-			buildPhases = (
-				9BA867F01A4DF3B900121ED5 /* Sources */,
-				9BA867F11A4DF3B900121ED5 /* Frameworks */,
-				9BA867F21A4DF3B900121ED5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9BA867F61A4DF3B900121ED5 /* PBXTargetDependency */,
-			);
-			name = HUMSliderSampleTests;
-			productName = HUMSliderSampleTests;
-			productReference = 9BA867F41A4DF3B900121ED5 /* HUMSliderSampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -177,15 +189,15 @@
 		9BA867D31A4DF3B900121ED5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Just Hum, LLC";
 				TargetAttributes = {
+					331B858C20ECB7CF00C16AD7 = {
+						CreatedOnToolsVersion = 9.4.1;
+						ProvisioningStyle = Automatic;
+					};
 					9BA867DA1A4DF3B900121ED5 = {
 						CreatedOnToolsVersion = 6.1.1;
-					};
-					9BA867F31A4DF3B900121ED5 = {
-						CreatedOnToolsVersion = 6.1.1;
-						TestTargetID = 9BA867DA1A4DF3B900121ED5;
 					};
 				};
 			};
@@ -203,12 +215,19 @@
 			projectRoot = "";
 			targets = (
 				9BA867DA1A4DF3B900121ED5 /* HUMSliderSample */,
-				9BA867F31A4DF3B900121ED5 /* HUMSliderSampleTests */,
+				331B858C20ECB7CF00C16AD7 /* HUMSlider */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		331B858B20ECB7CF00C16AD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BA867D91A4DF3B900121ED5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -216,13 +235,6 @@
 				9BA867EA1A4DF3B900121ED5 /* Main.storyboard in Resources */,
 				9BA867EF1A4DF3B900121ED5 /* LaunchScreen.xib in Resources */,
 				9BA867EC1A4DF3B900121ED5 /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9BA867F21A4DF3B900121ED5 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +258,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		331B858820ECB7CF00C16AD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				331B859A20ECB7DA00C16AD7 /* HUMSlider.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BA867D71A4DF3B900121ED5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -253,25 +273,16 @@
 				9BA867E71A4DF3B900121ED5 /* ViewController.m in Sources */,
 				9BA867E41A4DF3B900121ED5 /* AppDelegate.m in Sources */,
 				9BA867E11A4DF3B900121ED5 /* main.m in Sources */,
-				9BA868071A4DF3DF00121ED5 /* HUMSlider.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9BA867F01A4DF3B900121ED5 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9BA867FB1A4DF3B900121ED5 /* HUMSliderSampleTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9BA867F61A4DF3B900121ED5 /* PBXTargetDependency */ = {
+		331B859320ECB7CF00C16AD7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9BA867DA1A4DF3B900121ED5 /* HUMSliderSample */;
-			targetProxy = 9BA867F51A4DF3B900121ED5 /* PBXContainerItemProxy */;
+			target = 331B858C20ECB7CF00C16AD7 /* HUMSlider */;
+			targetProxy = 331B859220ECB7CF00C16AD7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -295,6 +306,69 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		331B859720ECB7D000C16AD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = HUMSlider/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.justhum.HUMSlider;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		331B859820ECB7D000C16AD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = HUMSlider/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.justhum.HUMSlider;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 		9BA867FC1A4DF3B900121ED5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -398,6 +472,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = HUMSliderSample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -410,6 +485,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = HUMSliderSample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -457,6 +533,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		331B859620ECB7D000C16AD7 /* Build configuration list for PBXNativeTarget "HUMSlider" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				331B859720ECB7D000C16AD7 /* Debug */,
+				331B859820ECB7D000C16AD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9BA867D61A4DF3B900121ED5 /* Build configuration list for PBXProject "HUMSliderSample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -471,15 +556,6 @@
 			buildConfigurations = (
 				9BA867FF1A4DF3B900121ED5 /* Debug */,
 				9BA868001A4DF3B900121ED5 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9BA868011A4DF3B900121ED5 /* Build configuration list for PBXNativeTarget "HUMSliderSampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9BA868021A4DF3B900121ED5 /* Debug */,
-				9BA868031A4DF3B900121ED5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
