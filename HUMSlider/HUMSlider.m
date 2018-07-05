@@ -263,7 +263,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     [self.allTickBottomConstraints insertObject:bottomConstraint atIndex:index];
     [self pinTickWidthAndHeight:currentItem];
     
-    double constant = [self tickPixelOffsetFromMiddle:newlyAddedTick];
+    CGFloat constant = [self tickPixelOffsetFromMiddle:newlyAddedTick];
     
     // Pin the middle tick to the middle of the slider.
     NSLayoutConstraint *middle = [NSLayoutConstraint constraintWithItem:currentItem
@@ -913,14 +913,14 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 }
 
 - (CGFloat)tickPixelOffsetFromMiddle:(Tick*)tick {
-    double trackWidth = trackRect.size.width - [self thumbImageWidth] + trackRect.origin.x; // :)
-    double constant = (tick.position * trackWidth) - (trackWidth / 2);
+    CGFloat trackWidth = trackRect.size.width - [self thumbImageWidth] + trackRect.origin.x; // :)
+    CGFloat constant = (tick.position * trackWidth) - (trackWidth / 2);
     return constant;
 }
 
 - (CGFloat)thumbImageWidth
 {
-    double imgThumbImageWidth = self.currentThumbImage.size.width;
+    CGFloat imgThumbImageWidth = self.currentThumbImage.size.width;
     // CASE if the thumb image width is set, is nonzero and doesn't match our current var, set the var to the correct value.
     if (imgThumbImageWidth && imgThumbImageWidth != 0 && imgThumbImageWidth != thumbImageWidth) {
         thumbImageWidth = imgThumbImageWidth;
