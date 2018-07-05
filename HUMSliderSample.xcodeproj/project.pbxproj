@@ -10,7 +10,7 @@
 		331B859420ECB7CF00C16AD7 /* HUMSlider.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; };
 		331B859520ECB7CF00C16AD7 /* HUMSlider.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		331B859A20ECB7DA00C16AD7 /* HUMSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA868061A4DF3DF00121ED5 /* HUMSlider.m */; };
-		331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = 331B859C20ECB90000C16AD7 /* HUMSlider.h */; };
+		331B859D20ECB90000C16AD7 /* HUMSlider.h in Headers */ = {isa = PBXBuildFile; fileRef = 331B859C20ECB90000C16AD7 /* HUMSlider.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9BA867E11A4DF3B900121ED5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E01A4DF3B900121ED5 /* main.m */; };
 		9BA867E41A4DF3B900121ED5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E31A4DF3B900121ED5 /* AppDelegate.m */; };
 		9BA867E71A4DF3B900121ED5 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA867E61A4DF3B900121ED5 /* ViewController.m */; };
@@ -47,6 +47,7 @@
 		331B858D20ECB7CF00C16AD7 /* HUMSlider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = HUMSlider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		331B859020ECB7CF00C16AD7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		331B859C20ECB90000C16AD7 /* HUMSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUMSlider.h; sourceTree = "<group>"; };
+		3385A3B620ECBF8F0071829C /* HUMSliderPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = HUMSliderPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		9BA867DB1A4DF3B900121ED5 /* HUMSliderSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HUMSliderSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BA867DF1A4DF3B900121ED5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9BA867E01A4DF3B900121ED5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 		9BA867D21A4DF3B900121ED5 = {
 			isa = PBXGroup;
 			children = (
+				3385A3B620ECBF8F0071829C /* HUMSliderPlayground.playground */,
 				9BA867DD1A4DF3B900121ED5 /* HUMSliderSample */,
 				331B858E20ECB7CF00C16AD7 /* HUMSlider */,
 				9BA867DC1A4DF3B900121ED5 /* Products */,
@@ -194,6 +196,7 @@
 				TargetAttributes = {
 					331B858C20ECB7CF00C16AD7 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					9BA867DA1A4DF3B900121ED5 = {
@@ -312,6 +315,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -331,6 +335,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.justhum.HUMSlider;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -343,6 +349,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -363,6 +370,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.justhum.HUMSlider;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";

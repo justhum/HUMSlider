@@ -14,7 +14,6 @@ FOUNDATION_EXPORT double HUMSliderVersionNumber;
 //! Project version string for HUMSlider.
 FOUNDATION_EXPORT const unsigned char HUMSliderVersionString[];
 
-
 typedef NS_ENUM(NSUInteger, HUMSliderSide) {
     HUMSliderSideLeft,
     HUMSliderSideRight
@@ -82,7 +81,7 @@ typedef NS_ENUM(NSUInteger, HUMSliderSide) {
 /**
  *  Sets the color to use as the desaturated color on selected side.
  *
- *  @param saturatedColor The UIColor to use
+ *  @param desaturatedColor The UIColor to use
  *  @param side The side you wish to set a desaturated color upon.
  */
 - (void)setDesaturatedColor:(UIColor *)desaturatedColor forSide:(HUMSliderSide)side;
