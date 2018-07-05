@@ -77,9 +77,9 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     self.allTickBottomConstraints = [NSMutableArray array];
     self.middleTickConstraints = [NSMutableArray array];
     
-    self.lowerTicksOnInactiveTouch = true; //default to lowering them.
-    self.customTicksEnabled = false; //default to true
-    self.enableTicksTransparencyOnIdle = true; // keep ticks at all times.
+    self.lowerTicksOnInactiveTouch = YES; // default to lowering them.
+    self.customTicksEnabled = NO; // default to false
+    self.enableTicksTransparencyOnIdle = YES; // Only show ticks when user is touching slider
     
     // Set default values.
     self.sectionCount = 9;
