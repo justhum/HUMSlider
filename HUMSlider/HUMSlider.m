@@ -809,7 +809,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
         alpha = 1;
         origin = [self tickInNotPoppedPositon];
     } else { // Ticks are in, coming out.
-        alpha = _enableTicksTransparencyOnIdle ? 0 : 1; // Transparent if setting is enabed.
+        alpha = self.enableTicksTransparencyOnIdle ? 0 : 1; // Transparent if setting is enabed.
         origin = [self tickOutPosition];
     }
 
