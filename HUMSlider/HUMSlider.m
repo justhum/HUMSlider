@@ -166,10 +166,11 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     }
     
     [self checkIntegrity];
+    [self updateTickHeights];
     
     if (refreshView) {
+        [self setNeedsLayout];
         [self layoutIfNeeded];
-        [self updateTickHeights];
     }
 }
 
@@ -275,12 +276,13 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
                                                                constant:constant];
     
     [self addConstraint:middle];
-    [self.middleTickConstraints addObject:middle];
+    [self.middleTickConstraints insertObject:middle atIndex:index];
     
     [self checkIntegrity];
     
-    if (refreshView)
-        [self layoutIfNeeded];
+    if (refreshView) {
+        [self setNeedsLayout];
+    }
 }
 
 // Size of the tick itself.
@@ -504,7 +506,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     
     if (firstLeft.constant != constant) {
 
-        for (NSInteger i = 0; i < [self.tickViews count]; i++) {
+        for (NSUInteger i = 0; i < [self.tickViews count]; i++) {
             NSLayoutConstraint *middleConstraint = self.middleTickConstraints[i];
             Tick *theTick = self.ticks[i];
             middleConstraint.constant = [self tickPixelOffsetFromMiddle:theTick];
@@ -519,6 +521,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
         [self animateAllTicksIn:YES];
     }
     [self updateTickHeights];
+    [self setNeedsLayout];
     [self layoutIfNeeded];
 }
 
@@ -714,7 +717,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 {
     UIView *tick = self.tickViews[tickIndex];
 
-    NSLayoutConstraint *constraint = self.middleTickConstraints[tickIndex];
+    NSLayoutConstraint *constraint = [self.middleTickConstraints objectAtIndex:tickIndex];
     
     CGFloat tickDistanceFromLeft = (trackRect.size.width / 2) + (constraint.constant) + trackRect.origin.x;
     CGFloat thumbSliderRadius = [self thumbImageWidth] / 2;
