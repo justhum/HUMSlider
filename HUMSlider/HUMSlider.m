@@ -64,14 +64,12 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 @implementation HUMSlider {
     CGFloat thumbImageWidth; // Reference to last computed thumb width.
-    CGRect trackRect; // store the track width from the layoutSubviews.
 }
 
 #pragma mark - Init
 
 - (void)commonInit
 {
-    trackRect = CGRectZero;
     [self thumbImageWidth]; // Lazy init of initial calc of thumb image width.
     
     self.allTickBottomConstraints = [NSMutableArray array];
@@ -485,7 +483,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)layoutSubviews
 {
-    trackRect = [self trackRectForBounds:self.bounds];
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
     
     [super layoutSubviews];
 
@@ -704,7 +702,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
                                           value:self.value];
 
     CGFloat sliderLoc = CGRectGetMidX(thumbRect);
-    
+
     // Animate tick based on the thumb location
     for (NSInteger i = 0; i < self.tickViews.count; i++) {
         [self animateCustomTickIfNeededAtIndex:i forTouchX:sliderLoc];
@@ -719,6 +717,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
     NSLayoutConstraint *constraint = [self.middleTickConstraints objectAtIndex:tickIndex];
     
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
     CGFloat tickDistanceFromLeft = (trackRect.size.width / 2) + (constraint.constant) + trackRect.origin.x;
     CGFloat thumbSliderRadius = [self thumbImageWidth] / 2;
     
@@ -847,7 +846,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     NSLayoutConstraint *constraint = self.allTickBottomConstraints[index];
     constraint.constant = yOrigin;
     
-    
     [UIView animateWithDuration:duration
                           delay:delay
          usingSpringWithDamping:0.6f
@@ -916,6 +914,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 }
 
 - (CGFloat)tickPixelOffsetFromMiddle:(Tick*)tick {
+    CGRect trackRect = [self trackRectForBounds:self.bounds];
     CGFloat trackWidth = trackRect.size.width - [self thumbImageWidth] + trackRect.origin.x; // :)
     CGFloat constant = (tick.position * trackWidth) - (trackWidth / 2);
     return constant;
