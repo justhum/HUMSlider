@@ -483,8 +483,6 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 
 - (void)layoutSubviews
 {
-    CGRect trackRect = [self trackRectForBounds:self.bounds];
-    
     [super layoutSubviews];
 
     [self updateCustomTickConstraintsIfNeeded];
