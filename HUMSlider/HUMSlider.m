@@ -167,7 +167,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     [self updateTickHeights];
     
     if (refreshView) {
-        [self refreshView];
+        [self layoutSubviews];
     }
 }
 
@@ -241,7 +241,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
 - (UIView*)setupCommonTickViewAndAddToSubview {
     UIView *tick = [[UIView alloc] init];
     tick.backgroundColor = self.tickColor;
-    tick.alpha = 0;
+    tick.alpha = _enableTicksTransparencyOnIdle ? 0 : 1;
     tick.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:tick];
     [self sendSubviewToBack:tick];
