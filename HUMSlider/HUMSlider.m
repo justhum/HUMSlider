@@ -167,8 +167,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     [self updateTickHeights];
     
     if (refreshView) {
-        [self setNeedsLayout];
-        [self layoutIfNeeded];
+        [self refreshView];
     }
 }
 
@@ -279,6 +278,7 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     [self checkIntegrity];
     
     if (refreshView) {
+        [self updateConstraints];
         [self setNeedsLayout];
     }
 }
@@ -844,15 +844,17 @@ static CGFloat const DefaultThumbPxWidth = 31; //Size of apple's default thumb i
     NSLayoutConstraint *constraint = self.allTickBottomConstraints[index];
     constraint.constant = yOrigin;
     
-    [UIView animateWithDuration:duration
-                          delay:delay
-         usingSpringWithDamping:0.6f
-          initialSpringVelocity:0.0f
-                        options:UIViewAnimationOptionCurveLinear
-                     animations:^{
-                         [self layoutIfNeeded];
-                     }
-                     completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [UIView animateWithDuration:duration
+                              delay:delay
+             usingSpringWithDamping:0.6f
+              initialSpringVelocity:0.0f
+                            options:UIViewAnimationOptionCurveLinear
+                         animations:^{
+                             [self layoutIfNeeded];
+                         }
+                         completion:nil];
+        });
 }
 
 #pragma mark - Calculation helpers
